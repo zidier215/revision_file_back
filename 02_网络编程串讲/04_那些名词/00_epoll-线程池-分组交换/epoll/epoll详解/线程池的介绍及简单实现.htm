@@ -1,0 +1,1210 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- saved from url=(0055)http://www.ibm.com/developerworks/cn/java/l-threadPool/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh-CN" xml:lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<title>线程池的介绍及简单实现</title>
+<meta http-equiv="PICS-Label" content="(PICS-1.1 &quot;http://www.icra.org/ratingsv02.html&quot; l gen true r (cz 1 lz 1 nz 1 oz 1 vz 1) &quot;http://www.rsac.org/ratingsv01.html&quot; l gen true r (n 0 s 0 v 0 l 0) &quot;http://www.classify.org/safesurf/&quot; l gen true r (SS~~000 1))">
+<link rel="schema.DC" href="http://purl.org/DC/elements/1.0/">
+<link rel="SHORTCUT ICON" href="http://www.ibm.com/favicon.ico">
+  <meta name="Owner" content="dw@cn.ibm.com">
+  <meta name="DC.Language" scheme="rfc1766" content="zh-CN">
+  <meta name="IBM.Country" content="CN">
+<meta name="Security" content="Public">
+<meta name="IBM.SpecialPurpose" content="SP001">
+<meta name="IBM.PageAttributes" content="sid=1003,1004">
+<meta name="Source" content="v16 Template Generator">
+<meta name="Robots" content="index,follow">
+<meta name="Abstract" content="服务器程序利用线程技术响应客户请求已经司空见惯,可能您认为这样做效率已经很高，但您有没有想过优化一下使用线程的方法。该文章将向您介绍服务器程序如何利用线程池来优化性能并提供一个简单的线程池实现。">
+<meta name="Description" content="服务器程序利用线程技术响应客户请求已经司空见惯,可能您认为这样做效率已经很高，但您有没有想过优化一下使用线程的方法。该文章将向您介绍服务器程序如何利用线程池来优化性能并提供一个简单的线程池实现。">
+<meta name="Keywords" content="java,tread pool,programing,, tttjca">
+<meta name="DC.Date" scheme="iso8601" content="2002-08-22">
+<meta name="DC.Type" scheme="IBM_ContentClassTaxonomy" content="CT316">
+<meta name="DC.Subject" scheme="IBM_SubjectTaxonomy" content="TT300">
+<meta scheme="IBM_WTMCategory" name="IBM.WTMCategory" content="SOFDCJVACN">
+<meta name="DC.Rights" content="© Copyright IBM Corporation 2002">
+<meta name="IBM.Effective" scheme="W3CDTF" content="2002-08-22">
+<meta name="title" content="线程池的介绍及简单实现">
+
+<!-- HEADER_SCRIPTS_AND_CSS_INCLUDE -->
+<link href="./线程池的介绍及简单实现_files/all.css" media="all" rel="stylesheet" title="www" type="text/css">
+<link href="./线程池的介绍及简单实现_files/screen.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+<link href="./线程池的介绍及简单实现_files/screen-uas.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+<link href="./线程池的介绍及简单实现_files/screen-fonts.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+<link href="./线程池的介绍及简单实现_files/handheld.css" media="handheld" rel="stylesheet" title="www" type="text/css">
+<link href="./线程池的介绍及简单实现_files/print.css" media="print" rel="stylesheet" title="www" type="text/css">
+<link href="./线程池的介绍及简单实现_files/overlay.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+
+<!-- dW-specific CSS -->
+<link href="./线程池的介绍及简单实现_files/dw-screen.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+<link href="./线程池的介绍及简单实现_files/dw-local-site.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+<link href="./线程池的介绍及简单实现_files/dw-screen-comments-ratings-signin.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+<link href="./线程池的介绍及简单实现_files/jquery.cluetip.css" media="screen,projection" rel="stylesheet" title="www" type="text/css">
+
+<!-- JPP: LOCAL URL FOR TESTING V16 DEFIANT MASTHEAD/FOOTER -->
+<link href="./线程池的介绍及简单实现_files/dw-mf2013-03.css" rel="stylesheet" title="www" type="text/css">
+<link href="./线程池的介绍及简单实现_files/dw-mf-cn.css" rel="stylesheet" title="www" type="text/css">
+<script src="./线程池的介绍及简单实现_files/ibmcommon.js" type="text/javascript">//</script><link rel="search" type="application/opensearchdescription+xml" href="http://www.ibm.com/search/opensearch/description.xml" title="IBM Search">
+<script src="./线程池的介绍及简单实现_files/dynamicnav.js" type="text/javascript">//</script>
+<script language="JavaScript" src="./线程池的介绍及简单实现_files/urltactic.js" type="text/javascript"></script>
+<!-- Rating_START -->
+<script language="JavaScript" type="text/javascript">
+  // <![CDATA[
+
+ dwr = {};
+  dwr.clickhere = '点击评分';
+  dwr.starIntro = ''; 
+  dwr.stars = '星';
+  dwr.star = '星'; 
+  dwr.avgRatingOf = '平均分';
+  dwr.youRated = '您的评分是';
+  dwr.avgRating = '平均分';
+  dwr.basedOnVote = '共 {1} 个评分'; // {1} to be substitue by code
+  dwr.basedOnVotes = '共 {1} 个评分';
+  dwr.leftParen = '（'; 
+  dwr.rightParen = ' ）'; 
+  dwr.space = ' '; 
+  dwr.yourRating = '您的评分';
+dwr.avgRating2 = '总共 {1} 评分的平均分';
+dwr.avgRating3 = '平均分{1} 星';
+dwr.rateThisArticle = '为本文评分';
+dwr.votes = '{1}个评分';
+dwr.vote = '{1}个评分';
+dwr.submitErr = '错误：提交失败，请重试。';
+dwr.noRatingErr = '错误：请选择一个评分并重新提交。';
+dwr.submit = '提交';
+// ]]>
+</script>
+
+<!-- Rating_START -->
+<script language="JavaScript" src="./线程池的介绍及简单实现_files/showrating.js" type="text/javascript"></script>
+<style type="text/css">
+  .metavalue {
+  display: none;
+  }
+</style>
+<!-- Rating_END --><!-- RESERVED_HEADER_INCLUDE -->
+<script language="javascript" src="./线程池的介绍及简单实现_files/ajax1.js" type="text/javascript"></script>
+<script language="javascript" src="./线程池的介绍及简单实现_files/search_counter-maverick.js" type="text/javascript"></script>
+<script language="javascript" src="./线程池的介绍及简单实现_files/request_referer_capture-maverick.js" type="text/javascript"></script>
+<script language="JavaScript" type="text/javascript">
+ <!--
+ setDefaultQuery('defaultHere');
+ //-->
+</script>
+<script language="JavaScript" type="text/javascript">
+ <!--
+ function openNewWindow(url,tar,arg){window.open(url,tar,arg);}
+ //-->
+</script>
+  <!-- Include file support -->
+  <script language="JavaScript" type="text/javascript">
+    (function($) {
+    jQuery.extend({
+    getInc: function(u,d){
+    if(u==null)return;
+    jQuery.ajax({
+    type: "GET",
+    url: u,
+    dataType: "text",
+    success: function(t) {
+    jQuery(d).html(t);
+    ibmCommon.initShowHide(jQuery(d).children()[0]);	
+    },
+    async: true
+    });
+    }
+    });
+    })(jQuery);
+  </script>
+<script id="mhMenu" type="text/javascript" src="./线程池的介绍及简单实现_files/cnzh-utf8.js" charset="UTF-8"></script><script id="wiBundle" type="text/javascript" src="./线程池的介绍及简单实现_files/Controller" charset="UTF-8"></script></head>
+
+<body id="ibm-com">
+<div id="ibm-top" class="ibm-landing-page">
+
+<!-- MASTHEAD_BEGIN -->
+<!-- MASTHEAD_BEGIN -->
+<div class="ibm-access"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#ibm-content">跳转到主要内容</a></div>
+<div id="ibm-masthead-dw">
+  
+    <!-- TOP ROW -->    
+    <div id="dw-masthead-top-row">
+    	<ul id="ibm-mast-options-dw" class="cn">
+    		<li id="dw-mast-top-0"> 	
+    			<a class="" href="http://www.ibm.com/developerworks/dwwi/DWAuthRouter?m=loginpage&lang=zh&d=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fcn%2Fjava%2Fl-threadPool%2F" title="">登录 (或注册)</a>
+    		</li>
+    		<li id="dw-mast-top-1" class="dw-mast-top-1-cn">
+    			<a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#SELECTLANG">中文</a><img class="dw-preload" src="./线程池的介绍及简单实现_files/arrow-down-active.gif" width="8" height="7" alt="">
+    		</li>
+    		<li id="dw-mast-top-2" class="dw-mf-hide">
+    			<a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/photo.do" alt="PHOTO" class="dw-mast-profimg" width="20" height="20"> [userid]</a>
+    		</li>
+    		<li id="dw-mast-top-3">
+    			<a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/ibm-smlogo.gif" width="44" height="16" alt="IBM®"></a>
+    		</li>
+    	</ul>
+	</div>
+    
+    <!-- TOP ROW SLIDER -->
+    <div id="ibm-my-menu-dw">    
+        <div class="ibm-ribbon-pane-dw">
+            <div class="ibm-ribbon-section-dw">
+                <!-- Sign-in -->
+                <div class="dw-mast-columns">                
+					<div class="dw-mast-col-1-1">
+						<div id="dw-mast-sso">
+							<!--<div id="dw-mast-sso-reg">
+								<p class="dw-mast-sso-reg-cn">如果您还没有注册到 IBM 注册系统，我们为给您带来的不便表示道歉，并请您马上注册。 							
+									<a href="#" onclick="(function () {window.location='/developerworks/dwwi/DWAuthRouter?m=reg&amp;lang=zh&amp;d='+encodeURIComponent(location.href);})();">现在注册</a>。</p>
+							</div>-->
+							<div id="signin_error_mf" class="no-display"></div>
+							<div id="dw-mast-sso-form">
+								<form id="sForm_mf" action="" method="post" name="sForm_name_mf" onsubmit="return false;">
+									<div id="dw-mast-sso-id" class="dw-mast-sso-id-cn">
+										<label for="ibmid_mf">IBM ID：</label>
+										<input id="ibmid_mf" type="text" value="" name="ibmid_name_mf" maxlength="100" onkeypress="handleEP(event,this.form,&#39;mf&#39;);" class="">
+									</div>
+									<div id="dw-mast-sso-pw" class="dw-mast-sso-pw-cn">
+										<label for="pw_mf">密码：</label>
+										<input id="pw_mf" type="password" value="" name="pw_name_mf" maxlength="100" onkeypress="handleEP(event,this.form,&#39;mf&#39;);" class="">
+									</div>
+									<div id="dw-mast-sso-target" class="dw-mast-sso-target-cn">
+										<p class="dw-mf-perm-box">
+											<input id="perm_mf" type="checkbox" name="perm_name_mf"><label for="perm_mf"> 保持登录。</label>
+										</p>
+									</div>
+									<div id="dw-mast-sso-terms">
+										<p class="dw-mast-sso-terms-cn">单击提交则表示您同意developerWorks 的条款和条件。 <a href="http://www.ibm.com/developerworks/mydeveloperworks/terms?lang=zh">查看条款和条件</a>.</p>
+									</div>
+									<div>
+										<input class="dw-mf-submit-btn-cn" name="ibm_submit_name_mf" value="提交" onclick="signin(&#39;mf&#39;);return false;" type="submit">
+									</div>
+								</form>
+							</div>
+							<div id="dw-mast-sso-update">
+								<div id="dw-mast-sso-update-id">
+									<ul>
+										<li><a class="ibm-forward-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="(function () {window.location=&#39;/developerworks/dwwi/DWAuthRouter?m=reg&amp;lang=zh_CN&amp;d=&#39;+encodeURIComponent(location.href);})();">需要一个 IBM ID？</a></li>
+										
+									<li><a class="ibm-forward-link" href="http://www.ibm.com/developerworks/dwwi/jsp/WSHelp.jsp?lang=zh_CN">忘记 IBM ID？</a></li>
+									</ul>
+								</div>
+								<div id="dw-mast-sso-update-pw">
+								<ul class="dw-mf-pwupdate">
+									<li><a class="ibm-forward-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="(function () {window.location=&#39;https://www.ibm.com/account/profile?page=forgot&amp;lang=zh_CN&amp;appname=ibm&amp;required=null&amp;d=&#39;+encodeURIComponent(getAuthUrl())+&#39;%3Fm%3Dloginpage%26lang%3Dzh_CN%26d%3D&#39;+encodeURIComponent(location.href);})();">忘记密码？</a></li>
+									<li><a class="ibm-forward-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="(function () {window.location=&#39;https://www.ibm.com/account/profile?page=chpw&amp;lang=zh_CN&amp;appname=ibm&amp;required=null&amp;d=&#39;+encodeURIComponent(location.href);})();">更改您的密码</a></li>
+								</ul>
+									</div>
+							</div>
+							<div id="dw-mast-sso-text">
+			<!-- lk v17 updated text -->				    
+			<p>这是您第一次登陆到 developerWorks，已经自动为您创建了您的概要文件。 <strong>选择您概要文件中可以公开的信息的信息（如姓名、国家/地区，以及公司），这些信息同时也会与您所发布的内容相关联。 </strong>您可以随时更新您的 IBM 账号。</p>
+							<p class="dw-mf-secure-cn">所有提交的信息确保安全。</p>
+							</div>
+							<div class="dw-mast-close">
+								<ul>
+									<li><div class="dw-mast-close-sign-cn"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/c.gif" alt="关闭 [x]" width="20" height="10" border="0"></a></div></li>
+								</ul>
+							</div>	
+						</div>
+						
+						<div id="dw-mast-dname" class="dw-mf-hide">
+							<p>当您初次登录到 developerWorks 时，将会为您创建一份概要信息，您需要指定一个昵称。您的昵称将和您在 developerWorks 发布的内容显示在一起。</p><p><strong>昵称长度在 3 至 31 个字符之间</strong>。 您的昵称在 developerWorks 社区中必须是唯一的，并且出于隐私保护的原因，不能是您的电子邮件地址。</p>
+							<div id="signin_dname_error_mf" class="no-display"></div>
+							<div id="dw-mast-dname-form">
+								<form id="dForm_mf" action="" method="post" name="dForm_name_mf" onsubmit="return false;">
+									<div id="dw-mast-dname-mf">
+										<label for="dname_mf">昵称：</label>
+										<input id="dname_mf" name="dname_name_mf" maxlength="31" size="25" value="" type="text" onkeypress="handleEP(event,this.form,&#39;mf&#39;);">
+									</div>
+									<div id="dw-mast-dname-terms">
+										<p class="dw-mast-dname-terms-cn">单击<strong>提交</strong>则表示您同意developerWorks 的条款和条件。 <a href="http://www.ibm.com/developerworks/mydeveloperworks/terms?lang=zh">查看条款和条件</a>.</p>
+									</div>
+									<div>
+										<input class="dw-mf-submit-btn-cn" name="dname_submit_name_mf" value="提交" onclick="signin(&#39;mf&#39;);return false;" type="submit">
+									</div>
+								</form>								
+							</div>
+							<div id="dw-mast-dname-secure">
+								<p class="dw-mf-secure-cn">所有提交的信息确保安全。</p>
+							</div>
+							<div class="dw-mast-close">
+								<ul>
+									<li><div class="dw-mast-close-sign-cn"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/c.gif" alt="关闭 [x]" width="20" height="10" border="0"></a></div></li>
+								</ul>
+							</div>	
+						</div>
+	
+						<div id="dw-mast-auth" class="dw-mf-hide">
+							<div>
+
+								<h2>My developerWorks:</h2>
+<!-- lk v17 updated links and text -->							    
+               		<ul>
+							<li><a id="dw-mast-top-0-0" href="http://www.ibm.com/developerworks/community/homepage?lang=zh">我的首页</a></li>						    
+							<li><a href="http://www.ibm.com/developerworks/community/profiles/html/myProfileView.do?lang=zh">我的概要信息</a></li>
+							<li><a href="http://www.ibm.com/developerworks/community/groups/service/html/mycommunities?lang=zh">我的社区</a></li>
+			                 <li><a href="http://www.ibm.com/developerworks/community/news/?lang=zh">设置</a></li>
+										    
+						</ul>      
+							</div>
+							<div id="dw-mast-notify" class="dw-mf-hide">
+								<h2>我的通知：</h2>
+								<ul>
+									<li><a id="new_notify" href="http://www.ibm.com/developerworks/mydeveloperworks/homepage?lang=zh">{[num_notify] 个新通知}([num_notify] 个新通知)</a></li>
+									<li><a id="new_invite" href="http://www.ibm.com/developerworks/mydeveloperworks/profiles/html/wc.do?action=in&requireAuth=true&widgetId=friends&lang=[lang]">{[num_invite] 个网络请求}([num_invite] 个网络请求)</a></li>  
+								</ul>
+							</div>
+							<div class="dw-mast-more">
+								<ul class="ibm-link-list">
+									<li><a class="dw-more-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="signOut(); return false;"><strong>退出</strong></a></li>
+								</ul>
+							</div>
+							<div class="dw-mast-close">
+								<ul>
+									<li><div class="dw-mast-close-sign"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/c.gif" alt="关闭 [x]" width="20" height="10" border="0"></a></div></li>
+								</ul>
+							</div>		
+						</div>
+						
+					</div>
+                	
+                </div>
+                <!-- Site selector --> 
+				<div class="dw-mast-columns">
+					<div class="dw-mast-col-2-1">
+						<h2>选择语言：</h2>
+						<ul>
+							<li><a id="dw-mast-top-1-0" href="http://www.ibm.com/developerworks/">English</a></li>
+							<li><a href="http://www.ibm.com/developerworks/cn/">中文</a></li>
+							<li><a href="http://www.ibm.com/developerworks/jp/">日本語</a></li>
+						    <li><a href="http://www.ibm.com/developerworks/ru/">Русский</a></li>
+						</ul>
+					</div>
+					<div class="dw-mast-col-2-2">
+						<ul>
+							<li><a href="http://www.ibm.com/developerworks/br/">Português (Brasil)</a></li>
+							<li><a href="http://www.ibm.com/developerworks/ssa/">Español</a></li>
+							<li><a href="http://www.ibm.com/developerworks/vn/">Việt</a></li>
+						</ul>
+					</div>
+					<div class="dw-mast-close">
+						<ul>
+							<li><div class="dw-mast-close-lang"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/c.gif" alt="关闭 [x]" width="20" height="10" border="0"></a></div></li>
+						</ul>
+                    </div>
+                </div>
+                <div class="dw-mast-columns"><!-- Authenticated --></div>
+                <!-- IBM -->
+				<div class="dw-mast-columns">
+					<div class="dw-mast-col-2-1">
+						<ul>
+							<li><a id="dw-mast-top-3-0" href="http://www.ibm.com/cn/zh/">IBM 主页</a></li>
+							<li><a href="http://www.ibm.com/solutions/cn/zh/">解决方案</a></li>
+							<li><a href="http://www.ibm.com/software/cn/">软件</a></li>
+						</ul>
+					</div>
+					<div class="dw-mast-col-2-2 dw-mast-ibm">
+						<ul>
+							<li><a href="http://www.ibm.com/support/cn/zh/">支持门户</a></li>
+							<li><a href="http://www.ibm.com/support/documentation/cn/zh/">产品文档</a></li>
+							<li><a href="http://www.ibm.com/redbooks/">Redbooks（英文）</a></li>
+						</ul>
+					</div>
+					<div class="dw-mast-close">
+						<ul>
+							<li><div class="dw-mast-close-ibm-cn"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/c.gif" alt="关闭 [x]" width="20" height="10" border="0"></a></div></li>
+						</ul>
+                    </div> 
+				</div>
+			</div>
+        </div>
+    </div>
+
+    <!-- BOTTOM ROW -->
+    <div id="ibm-universal-nav-dw">
+        <ul id="ibm-unav-links-dw">
+        	<li id="ibm-unav-home-dwlogo">
+        		<a href="http://www.ibm.com/developerworks/cn/"><img src="./线程池的介绍及简单实现_files/dw-wordmark.gif" width="218" height="32" alt="developerWorks®"></a>
+        	</li>
+        </ul>
+    	<ul id="ibm-menu-links-dw" class="ibm-menu-links-dw-cn">
+    		
+    		<li id="dw-mast-nav-0"><a href="http://www.ibm.com/developerworks/cn/topics">技术主题</a></li>
+    		<li id="dw-mast-nav-1"><a href="http://www.ibm.com/developerworks/cn/downloads/">软件下载</a></li>
+    		<li id="dw-mast-nav-2"><a href="https://www.ibm.com/developerworks/community/?lang=zh">社区</a></li>
+    		<li id="dw-mast-nav-3"><a href="https://www.ibm.com/developerworks/community/groups/service/html/communityview?communityUuid=6d7f9e5d-5f89-4767-a006-a81b8d186370&lang=zh">技术讲座</a></li>
+    	</ul>   
+    	<form id="ibm-search-form" action="http://www.ibm.com/search/csass/search/" method="get" name="form1">
+    		<input type="hidden" name="sn" value="dw">
+    		<input type="hidden" name="lang" value="zh">
+    		<input type="hidden" name="cc" value="CN">
+    		<input type="hidden" name="en" value="utf">
+    		<input type="hidden" name="hpp" value="20">
+    		<input type="hidden" name="dws" value="cndw">
+    		<input type="hidden" name="lo" value="zh">
+    		<p>
+    			<label for="q"><img alt="查询:" height="1" width="1" src="./线程池的介绍及简单实现_files/c.gif"></label>
+    			<input type="text" value="搜索 developerWorks" name="q" maxlength="100" id="q">
+    			<input type="submit" id="ibm-search" class="ibm-btn-search ibm-btn-search-cn" name="Search" value="搜索">
+    		</p>
+    	</form>
+    </div>
+    
+    <!-- BOTTOM ROW SLIDER -->
+    <div id="ibm-common-menu-dw">
+        <div class="ibm-ribbon-pane-dw">
+            <div class="ibm-ribbon-section-dw">
+				<!-- Technical topics category -->
+  
+            	<div class="dw-mast-columns">
+            	<div class="dw-mast-col-5-1">
+            		<h2><a id="dw-mast-nav-0-0" href="http://www.ibm.com/developerworks/cn/topics/">技术主题</a></h2>
+            		
+            		<ul>
+            		    <li><a href="http://www.ibm.com/developerworks/cn/agile/">Agile
+            			    transformation</a></li>
+            			<li><a href="http://www.ibm.com/developerworks/cn/aix/">AIX and UNIX</a></li>
+            		    <li><a href="http://www.ibm.com/developerworks/cn/bigdata/">Big data</a></li>
+            			<li><a href="http://www.ibm.com/developerworks/cn/cloud/">Cloud computing</a></li>
+            		
+            			
+            		</ul>     
+            	</div>
+            	<div class="dw-mast-col-5-2">
+            		
+            		<ul>
+						<li><a href="http://www.ibm.com/developerworks/cn/ibmi/">IBM i</a></li>
+            		    <li><a href="http://www.ibm.com/developerworks/cn/data/">Information management</a></li>
+            		    <li><a href="http://www.ibm.com/developerworks/cn/java/">Java technology</a></li>
+            		    <li><a href="http://www.ibm.com/developerworks/cn/linux/">Linux</a></li>
+            			
+           			
+            		</ul>
+            	</div>
+            	<div class="dw-mast-col-5-3">
+            		
+            		<ul>
+						<li><a href="http://www.ibm.com/developerworks/cn/lotus/">Lotus</a></li>
+            		    <li><a href="http://www.ibm.com/developerworks/cn/mobile/">Mobile development</a></li>
+						<li><a href="http://www.ibm.com/developerworks/cn/opensource/">Open source</a></li>
+            		    <li><a href="http://www.ibm.com/developerworks/cn/rational/">Rational</a></li>
+            			<!--<li><a href="http://www.ibm.com/developerworks/cn/webservices/">SOA and web services</a></li>-->
+						
+            			</ul>
+            		
+            	</div>
+            	<div class="dw-mast-col-5-4">
+            		<ul>
+					<li><a href="http://www.ibm.com/developerworks/cn/social/">Social Business</a></li> 
+             		<li><a href="http://www.ibm.com/developerworks/cn/web/">Web development</a></li>  
+					<li><a href="http://www.ibm.com/developerworks/cn/websphere/">WebSphere</a></li> 
+           		<!--	<li><a href="http://www.ibm.com/developerworks/cn/xml/">XML</a></li>-->
+            		</ul>        
+            	</div>
+            	<div class="dw-mast-col-5-5">
+            		<ul>
+            			<li><a href="http://www.ibm.com/developerworks/cn/library/"><strong>文档库</strong></a></li>
+            			<li><a href="http://www.ibm.com/developerworks/cn/products/"><strong>产品 A - Z</strong></a></li>				    
+            		</ul>        
+            	</div>
+            	<div class="dw-mast-close">
+            		<ul>
+            			<li><div class="dw-mast-close-tech-cn"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/c.gif" alt="关闭 [x]" width="20" height="10" border="0"></a></div></li>
+            		</ul>
+            	</div>
+            </div>
+            	<!-- Evaluation software category -->
+            	<div class="dw-mast-columns">
+            		<div class="dw-mast-col-2-1">
+            			<h2><a id="dw-mast-nav-1-0" href="http://www.ibm.com/developerworks/cn/downloads">软件下载</a></h2>
+            			<ul>
+            				<li><a href="http://www.ibm.com/developerworks/cn/downloads/#data">Information management</a></li>
+            				<li><a href="http://www.ibm.com/developerworks/cn/downloads/#lotus">Lotus</a></li>
+            				<li><a href="http://www.ibm.com/developerworks/cn/downloads/#rational">Rational</a></li>
+            			</ul>            
+            		</div>
+            		<div class="dw-mast-col-2-2">
+            			<ul>
+            				<li><a href="http://www.ibm.com/developerworks/cn/downloads/#tivoli">Tivoli</a></li>
+            				<li><a href="http://www.ibm.com/developerworks/cn/downloads/#websphere">WebSphere</a></li>
+            				
+            			</ul>            
+            		</div>
+            		<div class="dw-mast-close">
+            			<ul>
+            				<li><div class="dw-mast-close-eval-cn"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/c.gif" alt="关闭 [x]" width="20" height="10" border="0"></a></div></li>
+            			</ul>
+            		</div>
+            	</div>
+            	<!-- Community category -->
+                <!-- lk v17 removed links, updated urls -->
+            	<div class="dw-mast-columns">
+            		<div class="dw-mast-col-2-1">
+            			<h2><a id="dw-mast-nav-2-0" href="https://www.ibm.com/developerworks/community/?lang=zh">社区</a></h2>
+            			<ul>
+            				<li><a href="https://www.ibm.com/developerworks/community/homepage/?lang=zh">我的首页</a></li>
+            				<li><a href="https://www.ibm.com/developerworks/community/profiles/?lang=zh">概要信息</a></li>
+            				<li><a href="https://www.ibm.com/developerworks/community/groups/?lang=zh">群组</a></li>
+							<li><a href="https://www.ibm.com/developerworks/community/blogs/?lang=zh">博客</a></li>
+             			</ul>     
+            		</div>
+            		<div class="dw-mast-col-2-2">
+            			<ul>
+                    
+				    <li><a href="https://www.ibm.com/developerworks/community/forums/?lang=zh">论坛</a></li>
+					<li><a href="https://www.ibm.com/developerworks/community/wikis/?lang=zh">Wiki</a></li>
+					<li><a href="https://www.ibm.com/developerworks/community/activities/?lang=zh">活动</a></li>
+            			</ul>
+            		</div>
+            		<div class="dw-mast-close">
+            			<ul>
+            				<li><div class="dw-mast-close-comm-cn"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/c.gif" alt="关闭 [x]" width="20" height="10" border="0"></a></div></li>
+            			</ul>
+            		</div>
+            	</div>
+            	<!-- Events category -->
+            	<div class="dw-mast-columns">
+            		<div class="dw-mast-col-1-1">
+            			<h2><a id="dw-mast-nav-3-0" href="https://www.ibm.com/developerworks/community/groups/service/html/communityview?communityUuid=6d7f9e5d-5f89-4767-a006-a81b8d186370&lang=zh">技术讲座</a></h2>
+            			<ul>
+            				<li><a href="https://www.ibm.com/developerworks/community/groups/service/html/communityview?communityUuid=6d7f9e5d-5f89-4767-a006-a81b8d186370&lang=zh">技术讲座</a></li>
+            				<li><a href="http://www.ibm.com/developerworks/cn/swi/">多媒体课堂</a></li>
+            				<li><a href="http://www.ibm.com/developerworks/find/webcasts/">网络广播（英文）</a></li>
+            				<li><a href="http://www.ibm.com/developerworks/find/events/">查找活动（技术讲座，网络广播，会议等）（英文）</a></li> 
+            			</ul>            
+            		</div>
+            		<div class="dw-mast-close">
+            			<ul>
+            				<li><div class="dw-mast-close-event-cn"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/c.gif" alt="关闭 [x]" width="20" height="10" border="0"></a></div></li>
+            			</ul>
+            		</div>
+            	</div>
+            </div>
+        </div>
+    </div>
+	
+</div>
+<div id="fdiv" class="ibm-access"><embed type="application/x-shockwave-flash" src="https://www.ibm.com/developerworks/js/dw-mf/connect.swf" width="1" height="1" id="sflash" name="sflash" quality="high" menu="false" wmode="window" movie="https://www.ibm.com/developerworks/js/dw-mf/connect.swf" swliveconnect="true" allowscriptaccess="always"></div>
+<!-- MASTHEAD_END --><!-- MASTHEAD_END -->
+
+<div id="ibm-pcon">
+
+<!-- CONTENT_BEGIN -->
+<div id="ibm-content">
+
+<!-- Navigation_Trail_BEGIN -->
+<!-- &nbsp; -->
+      <div id="ibm-content-head"><ul id="ibm-navigation-trail"><li class="ibm-first"><a href="http://www.ibm.com/developerworks/cn/">developerWorks 中国</a></li><li><a href="http://www.ibm.com/developerworks/cn/java/">Java technology</a></li><li><a href="http://www.ibm.com/developerworks/cn/views/java/libraryview.jsp">文档库</a></li></ul></div>
+<!-- Navigation_Trail_END -->
+
+<!-- dW_Summary Area_START -->
+<div id="dw-summary-article">
+
+<div class="dw-content-head">
+<h1>线程池的介绍及简单实现</h1><p>
+</p></div>
+
+<div class="ibm-container-body ibm-two-column">
+
+<div class="ibm-column ibm-first">
+<div class="author"><a class="dwauthor" rel="#authortip1" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#author1">幸勇</a>,  </div><div id="authortip1" class="dwauthor-onload-state ibm-no-print" style="display: none;">幸勇 一位软件设计开发者。爱好广泛。</div>
+<p></p>
+  <p><strong>简介：</strong>&nbsp;服务器程序利用线程技术响应客户请求已经司空见惯,可能您认为这样做效率已经很高，但您有没有想过优化一下使用线程的方法。该文章将向您介绍服务器程序如何利用线程池来优化性能并提供一个简单的线程池实现。</p>
+
+ 
+</div>
+
+<div class="ibm-column ibm-second">
+
+<p class="leading"><b>发布日期：</b>&nbsp;2002 年 8 月 22 日
+  
+<br><b>级别：</b>&nbsp;初级
+    
+
+<br><strong>访问情况 ：</strong>&nbsp;29553 次浏览
+  <br><strong>评论：</strong>&nbsp;<span id="nCmts">10&nbsp;(<a class="dw-view-comment" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#icomments">查看</a>&nbsp;|&nbsp;<a onclick="showSignIn();return false;" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#">添加评论</a> - 登录)</span>
+  <!-- Rating_Area_Begin -->
+  </p><div id="art-rating-summary"><img alt="平均分 5 星 共 145 个评分" src="./线程池的介绍及简单实现_files/stars120x20-5b.jpg" class="dw-avg-rating"> 平均分 (145个评分)<br><a class="dw-view-comment" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#iratings">为本文评分</a></div>
+  <!-- Rating_Area_End -->
+  <br>
+<p></p>
+</div>
+
+</div>
+</div>
+<!-- dW_Summary_Area_END -->
+
+<!-- CONTENT_BODY -->
+<div id="ibm-content-body">
+
+<!-- MAIN_COLUMN_BEGIN -->
+<div id="ibm-content-main">
+
+<!-- Related_Searches_Area_And_Overlays_Begin -->
+
+<!-- MAIN_COLUMN_CONTAINER_BEGIN -->
+<div class="ibm-container">
+
+<!-- MAIN_COLUMN_CONTENT_BEGIN -->
+<p><a name="1"><span class="atitle">线程池的技术背景</span></a></p>
+	
+      
+			
+      <p>在面向对象编程中，创建和销毁对象是很费时间的，因为创建一个对象要获取内存资源或者其它更多资源。在Java中更是如此，虚拟机将试图跟踪每一个对象，以便能够在对象销毁后进行垃圾回收。所以提高服务程序效率的一个手段就是尽可能减少创建和销毁对象的次数，特别是一些很耗资源的对象创建和销毁。如何利用已有对象来服务就是一个需要解决的关键问题，其实这就是一些"池化资源"技术产生的原因。比如大家所熟悉的数据库连接池正是遵循这一思想而产生的，本文将介绍的线程池技术同样符合这一思想。</p>
+			
+      <p>目前，一些著名的大公司都特别看好这项技术，并早已经在他们的产品中应用该技术。比如IBM的WebSphere，IONA的Orbix 2000在SUN的 Jini中，Microsoft的MTS（Microsoft Transaction Server 2.0），COM+等。</p>
+			
+      <p>现在您是否也想在服务器程序应用该项技术?</p>
+			
+      <div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#ibm-pcon" class="ibm-anchor-up-link">回页首</a></p><p><a name="2"><span class="atitle">线程池技术如何提高服务器程序的性能</span></a></p>
+      
+			
+      <p>我所提到服务器程序是指能够接受客户请求并能处理请求的程序，而不只是指那些接受网络客户请求的网络服务器程序。</p>
+			
+      <p>多线程技术主要解决处理器单元内多个线程执行的问题，它可以显著减少处理器单元的闲置时间，增加处理器单元的吞吐能力。但如果对多线程应用不当，会增加对单个任务的处理时间。可以举一个简单的例子：</p>
+			
+      <p> 假设在一台服务器完成一项任务的时间为T</p>
+			
+      <pre>     T1 创建线程的时间
+      T2 在线程中执行任务的时间，包括线程间同步所需时间
+      T3 线程销毁的时间		</pre>
+					
+      <p>显然T ＝ T1＋T2＋T3。注意这是一个极度简化的假设。</p>
+			
+      <p>可以看出T1,T3是多线程本身的带来的开销，我们渴望减少T1,T3所用的时间，从而减少T的时间。但一些线程的使用者并没有注意到这一点，所以在程序中频繁的创建或销毁线程，这导致T1和T3在T中占有相当比例。显然这是突出了线程的弱点（T1，T3），而不是优点（并发性）。</p>
+			
+      <p>线程池技术正是关注如何缩短或调整T1,T3时间的技术，从而提高服务器程序性能的。它把T1，T3分别安排在服务器程序的启动和结束的时间段或者一些空闲的时间段，这样在服务器程序处理客户请求时，不会有T1，T3的开销了。</p>
+			
+      <p>线程池不仅调整T1,T3产生的时间段，而且它还显著减少了创建线程的数目。在看一个例子：</p>
+			
+      <p>假设一个服务器一天要处理50000个请求，并且每个请求需要一个单独的线程完成。我们比较利用线程池技术和不利于线程池技术的服务器处理这些请求时所产生的线程总数。在线程池中，线程数一般是固定的，所以产生线程总数不会超过线程池中线程的数目或者上限（以下简称线程池尺寸），而如果服务器不利用线程池来处理这些请求则线程总数为50000。一般线程池尺寸是远小于50000。所以利用线程池的服务器程序不会为了创建50000而在处理请求时浪费时间，从而提高效率。</p>
+			
+      <p>这些都是假设，不能充分说明问题，下面我将讨论线程池的简单实现并对该程序进行对比测试，以说明线程技术优点及应用领域。</p>
+					
+      <div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#ibm-pcon" class="ibm-anchor-up-link">回页首</a></p><p><a name="3"><span class="atitle">线程池的简单实现及对比测试</span></a></p>
+	
+      
+			
+      <p> 一般一个简单线程池至少包含下列组成部分。</p>
+			
+      <ol>
+				
+        <li>线程池管理器（ThreadPoolManager）:用于创建并管理线程池</li>
+				
+        <li>工作线程（WorkThread）: 线程池中线程</li>
+				
+        <li>任务接口（Task）:每个任务必须实现的接口，以供工作线程调度任务的执行。</li>
+				
+        <li>任务队列:用于存放没有处理的任务。提供一种缓冲机制。</li>
+			
+      </ol>
+			
+      <p>线程池管理器至少有下列功能：创建线程池，销毁线程池，添加新任务
+创建线程池的部分代码如下：</p>
+		
+				
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"><tbody><tr><td class="code-outline"><pre class="displaycode">  …
+        //create threads
+        synchronized(workThreadVector)
+        {
+            for(int j = 0; j &lt; i; j++)
+            {
+                threadNum++;
+               WorkThread workThread = new WorkThread(taskVector, threadNum);
+                workThreadVector.addElement(workThread);
+            }
+        }
+…
+</pre></td></tr></tbody></table><br>
+	
+			
+      <p>注意同步workThreadVector并没有降低效率，相反提高了效率,请参考Brian Goetz的文章。
+ 销毁线程池的部分代码如下：</p>
+	
+				
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"><tbody><tr><td class="code-outline"><pre class="displaycode">  …
+        while(!workThreadVector.isEmpty())
+        {
+        if(debugLevel &gt; 2)
+         System.out.println("stop:"+(i));
+         i++;
+            try
+            {
+                WorkThread workThread = (WorkThread)workThreadVector.remove(0);
+                workThread.closeThread();
+                continue;
+            }
+            catch(Exception exception)
+            {
+                if(debugLevel &gt; 2)
+                    exception.printStackTrace();
+            }
+            break;
+        }
+   …
+   </pre></td></tr></tbody></table><br>
+			
+			
+      <p> 添加新任务的部分代码如下：</p>
+			
+				
+      <table width="100%" cellpadding="0" cellspacing="0" border="0"><tbody><tr><td class="code-outline"><pre class="displaycode">   …
+        synchronized(taskVector)
+        {
+            taskVector.addElement(taskObj);
+            taskVector.notifyAll();
+        }
+   …
+   </pre></td></tr></tbody></table><br>
+	
+			
+      <p>工作线程是一个可以循环执行任务的线程，在没有任务时将等待。由于代码比较多在此不罗列.</p>
+			
+      <p>任务接口是为所有任务提供统一的接口，以便工作线程处理。任务接口主要规定了任务的入口，任务执行完后的收尾工作，任务的执行状态等。在文章结尾有相关代码的下载。</p>
+			
+      <p>以上所描述的线程池结构很简单，一些复杂的线程池结构将不再此讨论。</p>
+			
+      <p>在下载代码中有测试驱动程序（TestThreadPool），我利用这个测试程序的输出数据统计出下列测试结果。测试有两个参数要设置：</p>
+			
+      <ol>
+				
+        <li>线程池中线程数，即线程池尺寸。</li>
+				
+        <li>要完成的任务数。</li>
+			
+      </ol>
+			
+      <p>分别将一个参数固定，另一个参数变动以考察两个参数所产生的不同结果。所用测试机器分别为普通PC机（Win2000 JDK1.3.1）和SUN服务器(Solaris Unix JDK1.3.1)，机器配置在此不便指明。</p>
+      <br><a name="N100B1"><b>表1:测试数据及对应结果</b></a><br>
+			
+      <table border="1" class="ibm-data-table" width="80%"><tbody><tr bgcolor="#C0C0C0"><td>线程池尺寸</td><td>任务数</td><td>没有应用线程池所用的时间（单位:毫秒，OS:win）</td><td>应用线程池所用的时间（单位:毫秒，OS:win）</td><td>没有应用线程池所用的时间（单位:毫秒，OS:Solaris）</td><td>应用线程池所用的时间（单位:毫秒，OS:Solaris）</td></tr><tr><td>1</td><td>5000</td><td>3896</td><td>130</td><td>6513</td><td>327</td></tr><tr><td>2</td><td>5000</td><td>3455</td><td>151</td><td>6221</td><td>659</td></tr><tr><td>4</td><td>5000</td><td>3425</td><td>120</td><td>5448</td><td>433</td></tr><tr><td>8</td><td>5000</td><td>3475</td><td>160</td><td>5769</td><td>1478</td></tr><tr><td>16</td><td>5000</td><td>3505</td><td>211</td><td>5785</td><td>1970</td></tr><tr><td>32</td><td>5000</td><td>3455</td><td>251</td><td>6403</td><td>875</td></tr><tr><td>64</td><td>5000</td><td>3595</td><td>501</td><td>5182</td><td>1103</td></tr><tr><td>128</td><td>5000</td><td>3515</td><td>881</td><td>5154</td><td>405</td></tr><tr><td>256</td><td>5000</td><td>3495</td><td>3104</td><td>5502</td><td>1589</td></tr><tr><td>512</td><td>5000</td><td>3425</td><td>5488</td><td>5667</td><td>1262</td></tr><tr><td>16</td><td>1</td><td>20</td><td>0</td><td>22</td><td>3</td></tr><tr><td>16</td><td>2</td><td>20</td><td>20</td><td>21</td><td>13</td></tr><tr><td>16</td><td>4</td><td>20</td><td>10</td><td>27</td><td>10</td></tr><tr><td>16</td><td>8</td><td>20</td><td>20</td><td>22</td><td>24</td></tr><tr><td>16</td><td>16</td><td>30</td><td>20</td><td>29</td><td>48</td></tr><tr><td>16</td><td>32</td><td>40</td><td>20</td><td>46</td><td>108</td></tr><tr><td>16</td><td>64</td><td>60</td><td>20</td><td>72</td><td>199</td></tr><tr><td>16</td><td>128</td><td>110</td><td>20</td><td>148</td><td>335</td></tr><tr><td>16</td><td>256</td><td>201</td><td>20</td><td>252</td><td>132</td></tr><tr><td>16</td><td>512</td><td>411</td><td>40</td><td>522</td><td>382</td></tr><tr><td>16</td><td>1024</td><td>811</td><td>71</td><td>1233</td><td>610</td></tr><tr><td>16</td><td>2048</td><td>1552</td><td>80</td><td>2045</td><td>135</td></tr><tr><td>16</td><td>4096</td><td>2874</td><td>250</td><td>4828</td><td>787</td></tr></tbody></table>
+			
+      
+				
+        <br><a name="N102BA"><b>图1.线程池的尺寸的对服务器程序的性能影响</b></a><br>
+				
+        <img alt="图1.线程池的尺寸的对服务器程序的性能影响" height="362" src="./线程池的介绍及简单实现_files/ThreadPoolTest1.gif" width="580">
+			
+      <br> 
+			
+      <p>根据以上统计数据可得出下图：</p>
+		
+				
+      
+					
+        <br><a name="N102CD"><b>图2.任务数对服务器程序的冲击 </b></a><br>
+					
+        <img alt="图2.任务数对服务器程序的冲击" height="364" src="./线程池的介绍及简单实现_files/ThreadPoolTest2.gif" width="580">
+				
+      <br> 
+			
+      <p>数据分析如下：</p>
+			
+      <p>图1是改变线程池尺寸对服务器性能的影响，在该测试过程中，服务器的要完成的任务数固定为为5000。从图1中可以看出合理配置线程池尺寸对于大量任务处理的效率有非常明显的提高，但是一旦尺寸选择不合理（过大或过小）就会严重降低影响服务器性能。理论上"过小"将出现任务不能及时处理的情况,但在图表中显示出某些小尺寸的线程池表现很好，这是因为测试驱动中有很多线程同步开销，且这个开销相对于完成单个任务的时间是不能忽略的。"过大"则会出现线程间同步开销太大的问题，而且在线程间切换很耗CPU时间，在图表显示的很清楚。可见任何一个好技术，如果滥用都会造成灾难性后果。</p>
+			
+      <p>图2是用不同数量的任务来冲击服务器程序，在该测试过程中，服务器线程池尺寸固定为16。可以看出线程池在处理少量任务时的优势不明显。所以线程池技术有一定的适应范围，关于适用范围将在后面讨论。但对于大量的任务的处理，线程池的优势表现非常卓越，服务器程序处理请求的时间虽然有波动，但是其平均值相对小多了。</p>
+			
+      <p>值得注意的是测试方案中，统计任务的完成时间没有包含了创建线程池的时间。在实际线程池工作时，即利用线程池处理任务时，创建线程池的时间是不必计算在内的。</p>
+			
+      <p>由于测试驱动程序有很多同步代码，特别是等待线程执行完毕的同步（代码中为sleepToWait(long l)方法的调用），这些代码降低了代码执行效率，这是测试驱动一个缺点，但这个测试驱动可以说明线程池相对于简单使用线程的优势。</p>
+							
+      <div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#ibm-pcon" class="ibm-anchor-up-link">回页首</a></p><p><a name="4"><span class="atitle">关于高级线程池的探讨</span></a></p>
+      
+			
+      <p>简单线程池存在一些问题，比如如果有大量的客户要求服务器为其服务，但由于线程池的工作线程是有限的，服务器只能为部分客户服务，其它客户提交的任务，只能在任务队列中等待处理。一些系统设计人员可能会不满这种状况，因为他们对服务器程序的响应时间要求比较严格，所以在系统设计时可能会怀疑线程池技术的可行性，但是线程池有相应的解决方案。调整优化线程池尺寸是高级线程池要解决的一个问题。主要有下列解决方案：</p>
+	
+				
+      <p><a name="N102F5"><span class="smalltitle">方案一：动态增加工作线程</span></a></p>
+			
+      
+			
+      <p>在一些高级线程池中一般提供一个可以动态改变的工作线程数目的功能，以适应突发性的请求。一旦请求变少了将逐步减少线程池中工作线程的数目。当然线程增加可以采用一种超前方式，即批量增加一批工作线程，而不是来一个请求才建立创建一个线程。批量创建是更加有效的方式。该方案还有应该限制线程池中工作线程数目的上限和下限。否则这种灵活的方式也就变成一种错误的方式或者灾难，因为频繁的创建线程或者短时间内产生大量的线程将会背离使用线程池原始初衷--减少创建线程的次数。</p>
+			
+      <p>举例：Jini中的TaskManager，就是一个精巧线程池管理器，它是动态增加工作线程的。SQL Server采用单进程(Single Process)多线程(Multi-Thread)的系统结构，1024个数量的线程池，动态线程分配，理论上限32767。</p>
+		
+				
+      <p><a name="N10303"><span class="smalltitle">方案二：优化工作线程数目</span></a></p>
+			
+      
+			
+      <p>如果不想在线程池应用复杂的策略来保证工作线程数满足应用的要求，你就要根据统计学的原理来统计客户的请求数目，比如高峰时段平均一秒钟内有多少任务要求处理，并根据系统的承受能力及客户的忍受能力来平衡估计一个合理的线程池尺寸。线程池的尺寸确实很难确定，所以有时干脆用经验值。</p>
+			
+      <p>举例：在MTS中线程池的尺寸固定为100。</p>
+	
+				
+      <p><a name="N10311"><span class="smalltitle">方案三：一个服务器提供多个线程池</span></a></p>
+			
+      
+			
+      <p>在一些复杂的系统结构会采用这个方案。这样可以根据不同任务或者任务优先级来采用不同线程池处理。</p>
+			
+      <p>举例：COM+用到了多个线程池。</p>
+			
+      <p>这三种方案各有优缺点。在不同应用中可能采用不同的方案或者干脆组合这三种方案来解决实际问题。</p>
+		
+      <div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#ibm-pcon" class="ibm-anchor-up-link">回页首</a></p><p><a name="5"><span class="atitle">线程池技术适用范围及应注意的问题</span></a></p>
+	
+      
+			
+      <p>下面是我总结的一些线程池应用范围,可能是不全面的。</p>
+			
+      <p>线程池的应用范围：</p>
+			
+      <ol>
+				
+        <li>需要大量的线程来完成任务，且完成任务的时间比较短。
+     WEB服务器完成网页请求这样的任务，使用线程池技术是非常合适的。因为单个任务小，而任务数量巨大，你可以想象一个热门网站的点击次数。 但对于长时间的任务，比如一个Telnet连接请求，线程池的优点就不明显了。因为Telnet会话时间比线程的创建时间大多了。</li>
+				
+        <li>对性能要求苛刻的应用，比如要求服务器迅速相应客户请求。</li>
+				
+        <li>接受突发性的大量请求，但不至于使服务器因此产生大量线程的应用。突发性大量客户请求，在没有线程池情况下，将产生大量线程，虽然理论上大部分操作系统线程数目最大值不是问题，短时间内产生大量线程可能使内存到达极限，并出现"OutOfMemory"的错误。</li>
+			
+      </ol>
+				
+      <div class="ibm-alternate-rule"><hr></div><p class="ibm-ind-link ibm-back-to-top"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#ibm-pcon" class="ibm-anchor-up-link">回页首</a></p><p><a name="6"><span class="atitle">结束语</span></a></p>
+	
+      
+			
+      <p>本文只是简单介绍线程池技术。可以看出线程池技术对于服务器程序的性能改善是显著的。线程池技术在服务器领域有着广泛的应用前景。希望这项技术能够应用到您的多线程服务程序中。</p>
+					
+    <!-- CMA ID: 163049 --> <!-- Site ID: 10 --> <!-- XSLT stylesheet used to transform this file: dw-document-html-6.0.xsl -->
+<br>
+<p><a name="resources"><span class="atitle">参考资料 </span></a></p>
+					
+      <p>Danny Ayers 等:Professional Java Server Programming</p>
+      <p>Tarak Modi: Why Thread Pools are Important in Java</p>
+      <p>Brett Spell :Professional java Programming</p>
+      <p>Jini(TM)  v1.2.1代码</p>
+      <p>Brian Goetz 的 Java 理论和实践专栏</p>
+      <p>Microsoft Knowledge Base Article :Q282490</p>
+<p><a name="author"><span class="atitle">关于作者</span></a></p><div class="ibm-container ibm-portrait-module ibm-alternate-two"><div class="ibm-container-body"><p><a name="author1"> </a>幸勇 一位软件设计开发者。爱好广泛。</p></div></div>
+<!-- MAIN_COLUMN_CONTENT_END -->
+  <!-- OVERLAYS_START -->
+  <!-- Report_Abuse_Start -->
+  <div class="ibm-common-overlay ibm-no-print" id="reportabuseoverlay">
+    <div class="ibm-head"><p><a class="ibm-common-overlay-close" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#">关闭 [x]</a></p></div>
+    <div class="ibm-body">
+      <div class="ibm-main">
+        <a class="ibm-access" name="reportabuseoverlay">关于报告滥用的帮助</a>   
+        <div class="ibm-title"><h1>报告滥用</h1></div>
+        <div class="ibm-container ibm-alternate">
+          <p><strong>谢谢!</strong>  此内容已经标识给管理员注意。</p>
+          <div class="ibm-overlay-rule"><hr></div>
+          <div class="ibm-buttons-row">
+            <input type="button" onclick="ibmCommon.Overlays.hide(&#39;reportabuseoverlay&#39;);return false;" class="ibm-btn-cancel-sec dw-btn-cancel-sec" name="ibm-cancel" value="关闭">
+          </div>
+        </div>
+      </div> 
+    </div>
+    <div class="ibm-footer"></div>
+  </div>
+  <!-- Report_Abuse_Error_Start -->
+  <div class="ibm-common-overlay ibm-no-print" id="reportabuseoverlayerror">
+    <div class="ibm-head"><p><a class="ibm-common-overlay-close" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#">关闭 [x]</a></p></div>
+    <div class="ibm-body">
+      <div class="ibm-main">
+        <a class="ibm-access" name="reportabuseoverlayerror">关于报告滥用的帮助</a>   
+        <div class="ibm-title"><h1>报告滥用</h1></div>
+        <div class="ibm-container ibm-alternate">
+          <p class="ibm-ind-error"><strong>报告滥用提交失败。  请稍后重试。</strong></p>
+          <div class="ibm-overlay-rule"><hr></div>
+          <div class="ibm-buttons-row">
+            <input type="button" onclick="ibmCommon.Overlays.hide(&#39;reportabuseoverlayerror&#39;);return false;" class="ibm-btn-cancel-sec dw-btn-cancel-sec" name="ibm-cancel" value="关闭">
+          </div>
+        </div>
+      </div> 
+    </div>
+    <div class="ibm-footer"></div>
+  </div>
+  <!-- Sign in OVERLAY STARTS HERE --> 
+  <div class="ibm-common-overlay" id="signin_overlay">
+    <div class="ibm-head">
+      <p><a class="ibm-common-overlay-close" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="clearForm();">关闭 [x]</a></p>
+    </div>
+    <div class="ibm-body">
+      <div class="ibm-main">
+        <div class="ibm-title ibm-subtitle">
+          <h1>developerWorks：登录</h1>
+          <div id="ibm-overlay-error-signin" class="no-display"></div>
+        </div>
+        
+        <div class="ibm-container ibm-alternate ibm-buttons-last">
+          <div class="ibm-container-body">
+
+            <form class="ibm-column-form" id="sFormId" action="" method="post" name="sForm" onsubmit="return false;">
+              <p><label for="ibmid">IBM ID：</label><span><input name="ibm-id" id="ibmid" size="25" value="" class="required" type="text" onkeypress="handleEP(event,this.form);">
+                <br><a class="ibm-forward-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="(function () {window.location=&#39;/developerworks/dwwi/DWAuthRouter?m=reg&amp;lang=zh_CN&amp;d=&#39;+encodeURIComponent(location.href);})();">需要一个 IBM ID？</a>
+                <br><a class="ibm-forward-link" href="http://www.ibm.com/developerworks/dwwi/jsp/WSHelp.jsp?lang=zh_CN">忘记 IBM ID？</a></span>   
+              </p> 
+              <p><label for="password">密码：</label><span><input name="password" id="password" size="25" value="" class="required" type="password" onkeypress="handleEP(event,this.form);"><br>
+                <a class="ibm-forward-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="(function () {window.location=&#39;https://www.ibm.com/account/profile?page=forgot&amp;lang=zh_CN&amp;appname=ibm&amp;required=null&amp;d=&#39;+encodeURIComponent(getAuthUrl())+&#39;%3Fm%3Dloginpage%26lang%3Dzh_CN%26d%3D&#39;+encodeURIComponent(location.href);})();">忘记密码？</a><br>
+                <a class="ibm-forward-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="(function () {window.location=&#39;https://www.ibm.com/account/profile?page=chpw&amp;lang=zh_CN&amp;appname=ibm&amp;required=null&amp;d=&#39;+encodeURIComponent(location.href);})();">更改您的密码</a></span></p> 
+
+              <p class="dw-perm-box">
+                <span><input id="perm" type="checkbox" name="perm_name"><label for="perm"> 保持登录。</label></span>
+              </p>
+
+              <p>单击提交则表示您同意developerWorks 的条款和条件。 <a href="http://www.ibm.com/developerworks/mydeveloperworks/terms?lang=zh">使用条款</a></p>
+              <div class="ibm-buttons-row">
+                <p><input class="ibm-btn-arrow-pri" name="ibm-submit" value="提交" onclick="signin();return false;" type="submit"><span class="ibm-sep">&nbsp;</span>
+                  <input value="取消" type="button" name="ibm-cancel" class="ibm-btn-cancel-sec" onclick="clearForm();ibmCommon.Overlays.hide(&#39;signin_overlay&#39;);return false;"></p>
+              </div>
+            </form>
+            <div class="ibm-overlay-rule"><hr></div>
+            <p>当您初次登录到 developerWorks 时，将会为您创建一份概要信息。<strong>您在 developerWorks 概要信息中选择公开的信息将公开显示给其他人，但您可以随时修改这些信息的显示状态。</strong>您的姓名（除非选择隐藏）和昵称将和您在 developerWorks 发布的内容一同显示。</p>
+            <div class="dw-overlay-legal"><p>所有提交的信息确保安全。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ibm-footer"></div>
+  </div>
+  <!-- Sign in OVERLAY ENDS HERE --> 
+  
+  
+  <!-- Display name OVERLAY STARTS HERE --> 
+  <div class="ibm-common-overlay" id="displayname_overlay">
+    <div class="ibm-head">
+      <p><a class="ibm-common-overlay-close" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="clearForm();">关闭 [x]</a></p>
+    </div>
+    <div class="ibm-body">
+      <div class="ibm-main">
+        <div class="ibm-title ibm-subtitle">
+          <h1>请选择您的昵称：</h1>
+          <div id="ibm-overlay-error-dname" class="no-display"></div>
+        </div>
+        <div class="ibm-container ibm-alternate ibm-buttons-last">
+          <div class="ibm-container-body">
+            <p class="ibm-overlay-intro">当您初次登录到 developerWorks 时，将会为您创建一份概要信息，您需要指定一个昵称。您的昵称将和您在 developerWorks 发布的内容显示在一起。</p><p><strong>昵称长度在 3 至 31 个字符之间</strong>。 您的昵称在 developerWorks 社区中必须是唯一的，并且出于隐私保护的原因，不能是您的电子邮件地址。</p>
+            <form id="dFormId" method="post" action="" name="dForm" onsubmit="return false;" class="ibm-column-form">
+              <p><label for="displayname">昵称：</label><span><input name="displayname" id="displayname" size="25" value="" type="text" onkeypress="handleEP(event,this.form);"></span><span class="ibm-form-note">（长度在 3 至 31 个字符之间）</span>
+              </p>
+              
+              <div class="ibm-overlay-rule"><hr>
+              </div>
+              <p>单击<strong>提交</strong>则表示您同意developerWorks 的条款和条件。 <a href="http://www.ibm.com/developerworks/mydeveloperworks/terms?lang=zh">使用条款</a>.</p>
+              <div class="ibm-buttons-row">
+                <p><input class="ibm-btn-arrow-pri" name="ibm-submit" value="提交" onclick="signin();return false;" type="submit"><span class="ibm-sep">&nbsp;</span>
+                  <input value="取消" type="button" name="ibm-cancel" class="ibm-btn-cancel-sec" onclick="clearForm();ibmCommon.Overlays.hide(&#39;displayname_overlay&#39;);return false;"></p>
+              </div>
+            </form>
+            <div class="ibm-overlay-rule"><hr></div>
+            <div class="dw-overlay-legal"><p>所有提交的信息确保安全。</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ibm-footer"></div>
+  </div>
+  <!-- Display name OVERLAY ENDS HERE -->
+  <!-- OVERLAYS_END -->
+  <!-- RATINGS START -->
+  <p class="ibm-no-print"><span class="atitle"><a name="iratings">为本文评分</a></span></p>
+  <input id="art-rating" name="ratinga" type="hidden" value="5"><div id="art-rating-module"><p id="submitErr" class="ibm-ind-error" style="display: none;"><strong>错误：提交失败，请重试。</strong></p><p><span id="ratingSectUI"><img alt="平均分 5 星 共 145 个评分" src="./线程池的介绍及简单实现_files/stars120x20-5gw.jpg" class="dw-avg-rating"> 平均分 (145个评分)</span></p><div class="ibm-container" id="ratingForm"><div class="ibm-container-body dw-container-ratings"><form class="dw-ratings-form" onsubmit="artRating.submitRating(); return false;"><input type="radio" name="ratingstars" id="rat-1" value="1"><label class="rating-label" id="star1" for="rat-1">1 星</label><img id="rat-1-img" alt="1 星" title="1 星" src="./线程池的介绍及简单实现_files/stars120x20-1w.jpg" class="rating-image"><span class="dw-rating-text">1 星</span><br><input type="radio" name="ratingstars" id="rat-2" value="2"><label class="rating-label" id="star2" for="rat-2">2 星</label><img id="rat-2-img" alt="2 星" title="2 星" src="./线程池的介绍及简单实现_files/stars120x20-2w.jpg" class="rating-image2"><span class="dw-rating-text">2 星</span><br><input type="radio" name="ratingstars" id="rat-3" value="3"><label class="rating-label" id="star3" for="rat-3">3 星</label><img id="rat-3-img" alt="3 星" title="3 星" src="./线程池的介绍及简单实现_files/stars120x20-3w.jpg" class="rating-image2"><span class="dw-rating-text">3 星</span><br><input type="radio" name="ratingstars" id="rat-4" value="4"><label class="rating-label" id="star4" for="rat-4">4 星</label><img id="rat-4-img" alt="4 星" title="4 星" src="./线程池的介绍及简单实现_files/stars120x20-4w.jpg" class="rating-image2"><span class="dw-rating-text">4 星</span><br><input type="radio" name="ratingstars" id="rat-5" value="5"><label class="rating-label" id="star5" for="rat-5">5 星</label><img id="rat-5-img" alt="5 星" title="5 星" src="./线程池的介绍及简单实现_files/stars120x20-5w.jpg" class="rating-image2"><span class="dw-rating-text">5 星</span><div class="ibm-buttons-row"><p class="ibm-first"><input value="提交" type="submit" name="ibm-submit" class="ibm-btn-arrow-pri dw-ratings-submit"></p></div></form></div></div></div>
+  <script language="JavaScript" type="text/javascript">
+    // <![CDATA[
+   // widget div id and article id as args
+   window.artRating.init('art-rating-module','art-rating-summary');
+// ]]>
+  </script>
+  <!-- RATINGS END --> 
+  
+  <!-- INLINE_COMMENTS_START -->
+  <p class="ibm-no-print"><span class="atitle"><a name="icomments">评论</a></span></p>
+    <script language="JavaScript" type="text/javascript">
+      // <![CDATA[
+dwc = {};
+dwc.cmts = '条评论';
+dwc.signInPreText = '请';
+dwc.signIn = '登录';
+dwc.or = '或';
+dwc.register = '注册';
+dwc.signInPostText = '';
+dwc.leaveCmt = '后发表评论。';
+dwc.view = '查看';
+dwc.totalCmts = '共有评论';
+dwc.postYourCmt = '添加您的评论';
+dwc.show = '显示：';
+dwc.recentCmts = '最新评论';
+dwc.allCmts = '所有评论';
+dwc.tooLongCmt = '您的评论超过了 1000 字符限制';
+dwc.numCharsLeft = '剩余 <span id="charCount">{1}</span> 字符';
+dwc.reportAbuse = '报告滥用';
+dwc.notifyMsg = '有新评论时提醒我';
+dwc.htmlWarning = '注意：评论中不支持 HTML 语法'; 
+dwc.cmt = '评论：';
+dwc.addCmts = '添加评论';
+dwc.addCmt = '添加评论';
+dwc.doNotErase = '--在下方添加评论--'; 
+dwc.viewOrAddCmts = '查看或添加评论';
+dwc.reportInapprCont = '举报不良信息';
+dwc.reportInapprContLink = 'http://www.ibm.com/developerworks/forums/forum.jspa?forumID=1834';
+dwc.postingCmt = '正在发布评论……';
+dwc.noCmt = '快来添加第一条评论';
+dwc.netwkErr = '在检索评论时出错，请稍后刷新。';
+dwc.addACmt = '添加评论';
+dwc.instructCmt = '标有星号（<span class="ibm-required">*</span>）的是必填项目。';
+dwc.btnPost = '发布';
+dwc.btnPostAnon = '匿名发布';
+dwc.btnClrCmt = '清除评论';
+dwc.btnCancel = '取消';
+dwc.showRecent = '显示最新的 {1} 条评论'; // {1} is the count to be substituted
+dwc.showNext = '显示后 {1} 条评论'; // {1} is the count to be substituted
+dwc.showAllCmts = '显示所有评论';
+dwc.enterCmt = '请输入评论内容。';
+dwc.loginErr = '暂时无法验证您的登录状态，请稍后再试。';
+dwc.postErr = '暂时无法发布您的评论，请稍后再试。';
+dwc.postBy = '由 <strong>{1}</strong>  于 {2} '; // {1} is the author to be substituted; {2} is the date
+dwc.siteId = 10;
+dwc.lang = 'zh_CN';
+dwc.viperLang = 'zh';
+// ]]>
+    </script>
+    <div id="threadShow"><div id="cmtTog" style=""><div class="ibm-container ibm-alternate-two dw-commentbox dw-noborder"><p id="cmtHead"><label for="newCmt"><strong>添加评论:</strong></label></p><div class="ibm-container-body dw-commentbox dw-noborder"><p id="signInSect">请 <a onclick="showSignIn();return false;" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#">登录</a> 或 <a href="http://www.ibm.com/developerworks/dwwi/DWAuthRouter?m=register&lang=zh_CN&d=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fcn%2Fjava%2Fl-threadPool%2F%23icomments">注册</a>  后发表评论。</p><p>注意：评论中不支持 HTML 语法</p><span id="infoCmt"></span><form focus="name" enctype="multipart/form-data" method="post" action="" name="form" class="ibm-column-form"><p><textarea cols="120" rows="5" name="newCmt" id="newCmt" class="dw-inoperable" disabled=""></textarea><br></p><span class="ibm-input-group"><input type="checkbox" value="1" name="comment_notification" id="comment_notification" disabled=""><label id="notifyText" class="ibm-form-note dw-btn-cancel-sec" for="comment_notification">有新评论时提醒我</label></span><span class="ibm-form-note dw-btn-cancel-sec notifySection" id="maxCharsCount">剩余 <span id="charCount">1000</span> 字符</span><br><br><p></p><p class="ibm-buttons-row"><input type="button" value="发布" jquery1275054459750="11" name="postCmt" id="postCmt" class="ibm-btn-arrow-sec dw-btn-arrow-sec" alt="添加您的评论" disabled=""><br><br></p></form></div></div><div id="topControl" class="ibm-container ibm-alternate-two dw-comment-totals" style=""><div class="ibm-container-body"><form id="selectComments" method="get" action=""><p><span class="dw-comment-totals-label"><strong>共有评论 (<span id="numCmts">10</span>)</strong></span><span><img src="./线程池的介绍及简单实现_files/c.gif" width="100" height="10" alt=""></span><span class="dw-how-many-comments-label" style="" id="dropdownCmts"><label for="howManyComments">显示：</label>&nbsp;<select name="comments" id="howManyComments" class="dw-how-many-comments"><option selected="selected" value="recent">最新评论   </option><option value="all">所有评论</option></select><input type="image" class="ibm-btn-go" name="ibm-go" value="Go" src="./线程池的介绍及简单实现_files/short-btn.gif" alt="Go"><br></span></p></form></div></div><div id="cmtSect"><div class="comment"><div class="dw-icomment-container"><div class="dw-icomment-body dw-noborder"><div class="dw-icomment-body dw-noborder"><p>好文</p><p class="ibm-item-note-alternate dw-item-note-alternate-left">由 <strong><a href="https://www.ibm.com/developerworks/community/profiles/user/stone199141">stone199141</a></strong>  于 08 March 2013 </p><p class="ibm-ind-link ibm-item-note-alternate dw-item-note-alternate-right"><a class="ibm-caution-link dw-report-abuse" href="https://www.ibm.com/developerworks/community/report?lang=zh&referingURL=http://www.ibm.com/developerworks/cn/java/l-threadPool/&mymessage=%E8%AF%84%E8%AE%BA%EF%BC%9A%20%E5%A5%BD%E6%96%87%0D%E7%94%B1%20stone199141%20%20%E4%BA%8E%2008%20March%202013%20%0D%0D--%E5%9C%A8%E4%B8%8B%E6%96%B9%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA--" target="_newtab">报告滥用</a></p><div class="dw-clear-both"></div></div></div></div></div><div class="comment"><div class="dw-icomment-container"><div class="dw-icomment-body dw-noborder"><div class="dw-icomment-body dw-noborder"><p>对应用场景的分析及结论很实用。</p><p class="ibm-item-note-alternate dw-item-note-alternate-left">由 <strong><a href="https://www.ibm.com/developerworks/community/profiles/user/Looming">Looming</a></strong>  于 14 December 2012 </p><p class="ibm-ind-link ibm-item-note-alternate dw-item-note-alternate-right"><a class="ibm-caution-link dw-report-abuse" href="https://www.ibm.com/developerworks/community/report?lang=zh&referingURL=http://www.ibm.com/developerworks/cn/java/l-threadPool/&mymessage=%E8%AF%84%E8%AE%BA%EF%BC%9A%20%E5%AF%B9%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E7%9A%84%E5%88%86%E6%9E%90%E5%8F%8A%E7%BB%93%E8%AE%BA%E5%BE%88%E5%AE%9E%E7%94%A8%E3%80%82%0D%E7%94%B1%20Looming%20%20%E4%BA%8E%2014%20December%202012%20%0D%0D--%E5%9C%A8%E4%B8%8B%E6%96%B9%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA--" target="_newtab">报告滥用</a></p><div class="dw-clear-both"></div></div></div></div></div><div class="comment"><div class="dw-icomment-container"><div class="dw-icomment-body dw-noborder"><div class="dw-icomment-body dw-noborder"><p>在线程池尺寸为1时，应用线程池和没应用线程池为什么会有那么打的差别？ 不都是一个处理队列吗？</p><p class="ibm-item-note-alternate dw-item-note-alternate-left">由 <strong><a href="https://www.ibm.com/developerworks/community/profiles/user/ruandao">ruandao</a></strong>  于 06 December 2012 </p><p class="ibm-ind-link ibm-item-note-alternate dw-item-note-alternate-right"><a class="ibm-caution-link dw-report-abuse" href="https://www.ibm.com/developerworks/community/report?lang=zh&referingURL=http://www.ibm.com/developerworks/cn/java/l-threadPool/&mymessage=%E8%AF%84%E8%AE%BA%EF%BC%9A%20%E5%9C%A8%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%B0%BA%E5%AF%B8%E4%B8%BA1%E6%97%B6%EF%BC%8C%E5%BA%94%E7%94%A8%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%92%8C%E6%B2%A1%E5%BA%94%E7%94%A8%E7%BA%BF%E7%A8%8B%E6%B1%A0%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E6%9C%89%E9%82%A3%E4%B9%88%E6%89%93%E7%9A%84%E5%B7%AE%E5%88%AB%EF%BC%9F%20%E4%B8%8D%E9%83%BD%E6%98%AF%E4%B8%80%E4%B8%AA%E5%A4%84%E7%90%86%E9%98%9F%E5%88%97%E5%90%97%EF%BC%9F%0D%E7%94%B1%20ruandao%20%20%E4%BA%8E%2006%20December%202012%20%0D%0D--%E5%9C%A8%E4%B8%8B%E6%96%B9%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA--" target="_newtab">报告滥用</a></p><div class="dw-clear-both"></div></div></div></div></div><div class="comment"><div class="dw-icomment-container"><div class="dw-icomment-body dw-noborder"><div class="dw-icomment-body dw-noborder"><p>非常有用，谢谢啊。。。</p><p class="ibm-item-note-alternate dw-item-note-alternate-left">由 <strong><a href="https://www.ibm.com/developerworks/community/profiles/user/%E7%BA%A2%E7%8B%901985">红狐1985</a></strong>  于 22 October 2012 </p><p class="ibm-ind-link ibm-item-note-alternate dw-item-note-alternate-right"><a class="ibm-caution-link dw-report-abuse" href="https://www.ibm.com/developerworks/community/report?lang=zh&referingURL=http://www.ibm.com/developerworks/cn/java/l-threadPool/&mymessage=%E8%AF%84%E8%AE%BA%EF%BC%9A%20%E9%9D%9E%E5%B8%B8%E6%9C%89%E7%94%A8%EF%BC%8C%E8%B0%A2%E8%B0%A2%E5%95%8A%E3%80%82%E3%80%82%E3%80%82%0D%E7%94%B1%20%E7%BA%A2%E7%8B%901985%20%20%E4%BA%8E%2022%20October%202012%20%0D%0D--%E5%9C%A8%E4%B8%8B%E6%96%B9%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA--" target="_newtab">报告滥用</a></p><div class="dw-clear-both"></div></div></div></div></div><div class="comment"><div class="dw-icomment-container"><div class="dw-icomment-body dw-noborder"><div class="dw-icomment-body dw-noborder"><p>能否列举一些工作中遇到的线程池的应用实例吗，谢谢！</p><p class="ibm-item-note-alternate dw-item-note-alternate-left">由 <strong><a href="https://www.ibm.com/developerworks/community/profiles/user/fakeid">fakeid</a></strong>  于 16 August 2012 </p><p class="ibm-ind-link ibm-item-note-alternate dw-item-note-alternate-right"><a class="ibm-caution-link dw-report-abuse" href="https://www.ibm.com/developerworks/community/report?lang=zh&referingURL=http://www.ibm.com/developerworks/cn/java/l-threadPool/&mymessage=%E8%AF%84%E8%AE%BA%EF%BC%9A%20%E8%83%BD%E5%90%A6%E5%88%97%E4%B8%BE%E4%B8%80%E4%BA%9B%E5%B7%A5%E4%BD%9C%E4%B8%AD%E9%81%87%E5%88%B0%E7%9A%84%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%BA%94%E7%94%A8%E5%AE%9E%E4%BE%8B%E5%90%97%EF%BC%8C%E8%B0%A2%E8%B0%A2%EF%BC%81%0D%E7%94%B1%20fakeid%20%20%E4%BA%8E%2016%20August%202012%20%0D%0D--%E5%9C%A8%E4%B8%8B%E6%96%B9%E6%B7%BB%E5%8A%A0%E8%AF%84%E8%AE%BA--" target="_newtab">报告滥用</a></p><div class="dw-clear-both"></div></div></div></div></div></div></div><div id="bottomControl" class="ibm-container ibm-alternate-two dw-comment-totals" style="display:none"><div class="ibm-container-body"><form id="selectComments2" method="get" action=""><p><span class="dw-comment-totals-label"><strong>共有评论 (<span id="numCmts2">10</span>)</strong></span><span><img src="./线程池的介绍及简单实现_files/c.gif" width="100" height="10" alt=""></span><span class="dw-how-many-comments-label" style="" id="dropdownCmts2"><label for="howManyComments2">显示：</label>&nbsp;<select name="comments" id="howManyComments2" class="dw-how-many-comments"><option selected="selected" value="recent">最新评论   </option><option value="all">所有评论</option></select><input type="image" class="ibm-btn-go" name="ibm-go" value="Go" src="./线程池的介绍及简单实现_files/short-btn.gif" alt="Go"><br></span></p></form></div></div></div>
+  <!-- INLINE_COMMENTS_END -->
+  
+
+  <p class="ibm-ind-link ibm-back-to-top"><a class="ibm-anchor-up-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#ibm-pcon">回页首</a></p>
+
+<!-- Overlays -->
+<!-- lk - pull in overlays from ww when required on cn -->
+  </div>
+<!-- MAIN_COLUMN_CONTAINER_END -->
+
+<!-- Rating_Meta_BEGIN -->
+<!--Rating_Meta_BEGIN--><div class="metavalue">static.content.url=http://www.ibm.com/developerworks/js/artrating/</div><div class="metavalue">SITE_ID=10</div><div class="metavalue">Zone=Java technology</div><div class="metavalue">ArticleID=163049</div><div class="metavalue">ArticleTitle=线程池的介绍及简单实现</div><div class="metavalue">publish-date=08222002</div><div class="metavalue">author1-email=</div><div class="metavalue">author1-email-cc=</div><script language="javascript" type="text/javascript">document.write('<div class="metavalue">url='+location.href.replace(/</g, '%3C')+'</div>');</script><div class="metavalue">url=http://www.ibm.com/developerworks/cn/java/l-threadPool/</div><!--Rating_Meta_END-->
+<!-- Rating_Meta_END -->
+
+</div>
+<!-- MAIN_COLUMN_END-->
+
+<!-- RIGHT_COLUMN_BEGIN -->
+<div id="ibm-content-sidebar">
+
+<!-- RIGHT_COLUMN_CONTENT_BEGIN --> 
+<div class="ibm-container"><h2>内容</h2><div class="ibm-container-body"><img alt="" height="1" width="1" src="./线程池的介绍及简单实现_files/c(1).gif"><ul class="ibm-bullet-list"><li><a class="ibm-feature-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#1">线程池的技术背景</a></li><li><a class="ibm-feature-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#2">线程池技术如何提高服务器程序的性能</a></li><li><a class="ibm-feature-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#3">线程池的简单实现及对比测试</a></li><li><a class="ibm-feature-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#4">关于高级线程池的探讨</a></li><li><a class="ibm-feature-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#5">线程池技术适用范围及应注意的问题</a></li><li><a class="ibm-feature-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#6">结束语</a></li><li><a class="ibm-feature-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#resources">参考资料 </a></li><li><a class="ibm-feature-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#author">关于作者</a></li><li><a class="ibm-feature-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#icomments">建议</a></li></ul></div></div>
+
+ 
+
+
+<!-- Dig_Deeper -->
+
+<!-- High_Visibility_Offer -->
+
+<!-- Special_Offers -->
+
+<!-- RIGHT_COLUMN_CONTENT_END -->
+
+</div>
+<!-- RIGHT_COLUMN_END -->
+
+<!-- CONTENT_BODY_END -->
+</div>
+
+</div>
+<!-- CONTENT_END -->
+
+ <!-- END_IBM-PCON -->
+</div>
+
+<!-- FOOTER_BEGIN -->
+<div id="ibm-footer">
+<!-- IBM footer container; disabled -->
+</div>
+
+<div id="ibm-page-tools-dw">
+	<div id="dw-footer-top-row">
+		<ul id="dw-foot-options">
+			<li id="dw-print"><a class="ibm-print-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#">打印此页面</a></li>
+		</ul>
+		<ul id="ibm-foot-options-dw">
+			<li id="dw-foot-0" class="dw-foot-0-cn"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#">分享此页面</a></li>
+			<li id="dw-foot-1" class="dw-foot-1-cn"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#">关注 developerWorks</a></li>
+		</ul>
+	</div>       
+	
+	
+	<!-- TOP ROW SLIDER -->
+    <div id="dw-page-tools-menu">    
+        <div class="ibm-ribbon-pane-dw">
+            <div class="ibm-ribbon-section-dw">
+				<!-- Share this page -->			
+                <div class="dw-footer-columns">
+                    <div class="dw-footer-col-4-1">
+                    	<h2>分享此页面：</h2>                            
+						<ul class="ibm-link-list">
+						  <!--<li><a id="dw-foot-0-0" class="dwcn-sina-link"
+						        href="#"
+						        onClick="javascript:location.href='http://hits.sinajs.cn/A1/weiboshare.html?&amp;appkey=&amp;title='+escape(document.title)+'&amp;url='+escape(location.href)'+'&amp;pic=&ralateUid&amp;language=zh_cn;
+						        ">新浪微博</a></li> -->
+						   <li><a id="dw-foot-0-0" class="dwcn-sina-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="javascript:location.href=&#39;http://service.weibo.com/share/share.php?title=&#39;+encodeURIComponent(document.title)+&#39;&amp;url=&#39;+escape(location.href)+&#39;&amp;language=zh_cn&#39;
+						        ; ">新浪微博</a></li> 
+						   <li><a class="dwcn-renren-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="javascript:location.href=&#39;http://share.renren.com/share/buttonshare?title=&#39;+encodeURIComponent(document.title)+&#39;&amp;link=&#39;+escape(location.href);
+						        ">人人网</a></li> 
+						    <li><a class="dwcn-tencent-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="javascript:location.href=&#39;http://v.t.qq.com/share/share.php?title=&#39;+encodeURIComponent(document.title)+&#39;&amp;url=&#39;+escape(location.href);
+						        ">腾讯微博</a></li> 
+						   				
+						</ul>
+                    </div>
+                    <div class="dw-footer-col-4-2">
+						<ul class="ibm-link-list">
+						    <li><a class="dwcn-sohu-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="javascript:location.href=&#39;http://t.sohu.com/third/post.jsp?title=&#39;+encodeURIComponent(document.title)+&#39;&amp;link=&#39;+escape(location.href);
+						        ">搜狐微博</a></li>
+						    
+						    <li><a class="dwcn-netease-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#" onclick="javascript:location.href=&#39;http://t.163.com/article/user/checkLogin.do?info=&#39;+encodeURIComponent(document.title)+ &#39;&#39; +escape(location.href);
+						        ">网易微博</a></li>
+						    <li><a class="ibm-facebook-link" href="http://www.facebook.com/sharer.php?u=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fcn%2Fjava%2Fl-threadPool%2F&t=%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%BB%8B%E7%BB%8D%E5%8F%8A%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0">Facebook</a></li>
+						</ul>
+                </div>
+                    <div class="dw-footer-col-4-3">
+						<ul class="ibm-link-list">
+						 <li><a class="ibm-linkedin-link" href="http://www.linkedin.com/shareArticle?mini=true&url=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fcn%2Fjava%2Fl-threadPool%2F&title=%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%BB%8B%E7%BB%8D%E5%8F%8A%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0">LinkedIn</a></li>   
+						 <li><a class="ibm-twitter-link" href="http://twitter.com/home?status=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fcn%2Fjava%2Fl-threadPool%2F%20-%20%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%BB%8B%E7%BB%8D%E5%8F%8A%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0">Twitter</a></li>   
+						 <li><a class="ibm-delicious-link" href="http://delicious.com/post?url=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fcn%2Fjava%2Fl-threadPool%2F&title=%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%BB%8B%E7%BB%8D%E5%8F%8A%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0">Delicious</a></li>
+						
+						</ul>
+                    </div>
+                   <div class="dw-footer-col-4-4">
+						<ul class="ibm-link-list">
+						 <li><a class="ibm-digg-link" href="http://digg.com/submit?phase=2&url=http%3A%2F%2Fwww.ibm.com%2Fdeveloperworks%2Fcn%2Fjava%2Fl-threadPool%2F&title=%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E4%BB%8B%E7%BB%8D%E5%8F%8A%E7%AE%80%E5%8D%95%E5%AE%9E%E7%8E%B0">Digg</a></li>   
+						 <li><a class="ibm-email-link" href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#">发送此页面</a></li>
+						</ul>
+                    </div>
+                    <div class="dw-footer-close">
+						<ul>
+							<li><div class="dw-footer-close-share"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/c.gif" alt="关闭 [x]" width="20" height="10"></a></div></li>
+						</ul>
+                    </div>
+                </div>
+                  <!-- Follow developerWorks -->
+                <div class="dw-footer-columns">
+                    <div class="dw-footer-col-1-1 dw-footer-col-1-1-cn">
+                    	<h2>关注 developerWorks 中国网站：</h2>
+						<ul class="ibm-link-list">
+							<!--<li><a id="dw-foot-1-0" class="ibm-twitter-link" href="http://www.twitter.com/dwchina">Twitter</a></li>-->
+						    <li><a id="dw-foot-1-0" class="dwcn-sina-link" href="http://weibo.com/ibmdw/">新浪微博</a></li>
+						</ul>
+                    </div>
+                    <div class="dw-footer-close">
+						<ul>
+							<li><div class="dw-footer-close-follow-cn"><a href="http://www.ibm.com/developerworks/cn/java/l-threadPool/#"><img src="./线程池的介绍及简单实现_files/c.gif" alt="关闭 [x]" width="20" height="10"></a></div></li>
+						</ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="ibm-footer-module-dw">
+	<div class="dw-footer-columns">
+		<div class="dw-footer-col-6-1">
+			<ul>
+				<!--<li><a href="http://www.ibm.com/developerworks/aboutdw/">About</a></li>-->
+				<li><a href="https://www.ibm.com/developerworks/secure/feedback.jsp?domain=dwchina">帮助</a></li>
+				<li><a href="http://www.ibm.com/developerworks/cn/author/">联系编辑</a></li>
+				<li><a href="https://www.ibm.com/developerworks/secure/myideas2.jsp?domain=dwchina&start=true">提交内容</a></li>
+				<li><a href="http://www.ibm.com/developerworks/cn/sitemap/">网站导航</a></li>
+			</ul>
+		</div>
+		<div class="dw-footer-col-6-2">
+			<ul>
+				<li><a href="http://www.ibm.com/developerworks/cn/rss/">订阅源</a></li>
+				<li><a href="http://www.ibm.com/vrm/newsletter/10104?S_TACT=105AGX52&S_CMP=dwcntop">在线浏览每周时事通讯</a></li>
+			</ul>
+		</div>
+		<div class="dw-footer-col-6-3">
+			<ul>
+				<li><a href="https://www.ibm.com/developerworks/community/report?lang=zh">报告滥用</a></li>
+				<li><a href="https://www.ibm.com/developerworks/community/terms?lang=zh">使用条款</a></li>
+				<li><a href="http://www.ibm.com/privacy/cn/zh/">隐私条约</a></li>
+				<li><a href="http://www.ibm.com/ibm/accessibility/cn/">浏览辅助</a></li>
+			</ul>
+		</div>
+		<div class="dw-footer-col-6-4-cn">
+			<ul>
+<!-- lk v17 updated link -->			    
+				<li><a href="http://www.ibm.com/developerworks/cn/academic/">IBM 教育学院教育培养计划</a></li>
+				<li><a href="http://www.ibm.com/developerworks/cn/gep/">IBM 创业企业全球扶持计划</a></li>
+				<li><a href="http://www.ibm.com/partnerworld/isv/">ISV 资源 (英语)</a></li>
+			</ul>
+		</div>
+		<div class="dw-footer-col-6-5">
+		</div>
+		<div class="dw-footer-col-6-6">
+		</div>
+	</div>
+	<!-- Language selector no-script -->
+	<noscript>
+	&lt;div id="dw-footer-selectlang"&gt;
+		&lt;h2&gt;&lt;a name="SELECTLANG"&gt;选择语言：&lt;/a&gt;&lt;/h2&gt;
+		&lt;ul&gt;
+			&lt;li&gt;&lt;a href="http://www.ibm.com/developerworks/"&gt;English&lt;/a&gt;&lt;/li&gt;
+			&lt;li&gt;&lt;a href="http://www.ibm.com/developerworks/cn/"&gt;中文&lt;/a&gt;&lt;/li&gt;
+			&lt;li&gt;&lt;a href="http://www.ibm.com/developerworks/jp/"&gt;日本語&lt;/a&gt;&lt;/li&gt;
+			&lt;li&gt;&lt;a href="http://www.ibm.com/developerworks/ru/"&gt;Русский&lt;/a&gt;&lt;/li&gt;
+			&lt;li&gt;&lt;a href="http://www.ibm.com/developerworks/br/"&gt;Português (Brasil)&lt;/a&gt;&lt;/li&gt;
+			&lt;li&gt;&lt;a href="http://www.ibm.com/developerworks/ssa/"&gt;Español&lt;/a&gt;&lt;/li&gt;
+			&lt;li&gt;&lt;a href="http://www.ibm.com/developerworks/vn/"&gt;Việt&lt;/a&gt;&lt;/li&gt;
+		&lt;/ul&gt;
+	&lt;/div&gt;
+	</noscript>
+</div><!-- FOOTER_END -->
+
+ <!-- END_IBM-TOP -->
+<div id="ibm-overlay-top"></div></div>
+ 
+ <!-- SCRIPTS_INCLUDE_BEGIN -->
+<!-- JQuery start -->
+<script type="text/javascript" language="JavaScript" src="./线程池的介绍及简单实现_files/jquery.hoverIntent.minified.js"></script>
+<script type="text/javascript" language="JavaScript" src="./线程池的介绍及简单实现_files/jquery.cluetip.js"></script>
+<!-- xM Masthead/Footer -->
+<script src="./线程池的介绍及简单实现_files/jquery.tools.min.js" type="text/javascript">//</script>
+<script src="./线程池的介绍及简单实现_files/jquery.jscroll.js" type="text/javascript">//</script>
+<script src="./线程池的介绍及简单实现_files/dw_v16.js" type="text/javascript">//</script>
+<script src="./线程池的介绍及简单实现_files/flash-detect.js" type="text/javascript">//</script>
+<script src="./线程池的介绍及简单实现_files/dwsi.js" type="text/javascript">//</script>
+<script type="text/javascript" language="JavaScript" src="./线程池的介绍及简单实现_files/showcomments.js">//</script>
+<script language="JavaScript" type="text/javascript">
+	// <![CDATA[
+ jQuery('threadShow').showComments('95%',5,'nCmts','icomments');
+// ]]>
+</script>
+<script type="text/javascript" language="JavaScript">
+	jQuery.noConflict();     
+	// Put all your code in your document ready area
+	jQuery(document).ready(function(jQuery) {
+	// Do jQuery stuff using jQuery 
+	jQuery('a.dwauthor').cluetip({
+	local: true,
+	showTitle: false,
+	positionBy: 'bottomTop',
+	sticky: true,	
+	mouseOutClose: true,
+	closeText: '<img src="//dw1.s81c.com/developerworks/js/jquery/cluetip98/i/x.gif" alt="Close" />',
+	arrows: false,
+	dropShadow: true,
+	cluetipClass: 'dwbasic'
+	});   	
+	
+	rBHash = {};
+	rBHash['viperLang'] = 'zh';
+	rBHash['urlLang'] = 'cn';
+
+	// si
+	initSI();
+	});
+</script>
+<!-- JQuery end -->
+<!-- Overlay js -->
+<script language="JavaScript" src="./线程池的介绍及简单实现_files/overlay.js" type="text/javascript"></script><!-- BEGIN: Use this section to set page specific variables for the Unica Page Tag -->
+<script language="JavaScript">var NTPT_PGEXTRA="ibmSkillLevel=1&ibmAdoptPhase=667&ibmRole=710&ibmCmaId=163049&ibmContentAreas=java";</script>
+<!--END --><!-- SCRIPTS_INCLUDE_END -->
+
+<div id="ibm-metrics">
+<script src="./线程池的介绍及简单实现_files/stats.js" type="text/javascript">//</script>
+</div>
+
+
+
+<div id="cluetip-waitimage" style="position: absolute; z-index: 95; display: none;"></div><div id="cluetip" style="z-index: 96; display: none; position: absolute;"><div style="z-index: 95; opacity: 0.1; top: 1px; left: 1px; position: absolute; background-color: rgb(0, 0, 0);"></div><div style="z-index: 94; opacity: 0.1; top: 2px; left: 2px; position: absolute; background-color: rgb(0, 0, 0);"></div><div style="z-index: 93; opacity: 0.1; top: 3px; left: 3px; position: absolute; background-color: rgb(0, 0, 0);"></div><div style="z-index: 92; opacity: 0.1; top: 4px; left: 4px; position: absolute; background-color: rgb(0, 0, 0);"></div><div style="z-index: 91; opacity: 0.1; top: 5px; left: 5px; position: absolute; background-color: rgb(0, 0, 0);"></div><div style="z-index: 90; opacity: 0.1; top: 6px; left: 6px; position: absolute; background-color: rgb(0, 0, 0);"></div><div id="cluetip-outer" style="position: relative; z-index: 97;"><div id="cluetip-title"></div><div id="cluetip-inner"></div></div><div id="cluetip-extra"></div><div id="cluetip-arrows" class="cluetip-arrows" style="z-index: 97;"></div></div></body></html>

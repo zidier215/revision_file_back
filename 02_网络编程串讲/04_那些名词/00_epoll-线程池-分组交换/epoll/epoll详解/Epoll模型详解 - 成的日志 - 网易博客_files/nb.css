@@ -1,0 +1,53 @@
+body{color:#000000;}
+.fc00{color:#993300;}
+.fc01{color:#993300;}
+.fc02,.fc02 a{color:#990000;}
+.fc03,.fc03 a,.fc11 a{color:#006600;}
+.fc04,.fc04 a{color:#993300;}
+.fc05{color:#000000;}
+.fc06{color:#000000;}
+.fc07{color:#993366;}
+.fc08{color:#993300;}
+.fc09{color:#993300;}
+.fc10{color:#cc6600;}
+.bdc0{border-color:#cc6600;}
+.bdc1{border-color:#993300;}
+.bdc9t{border-top-color:#f4cca3;}
+.bdc9r{border-right-color:#f4cca3;}
+.bdc9b{border-bottom-color:#f4cca3;}
+.bdc9l{border-left-color:#f4cca3;}
+.bgc0,.bgc9:hover, .bgc9.js-bgc9-hover{background-color:#ffedcc;}
+.bgc1{background-color:#f4cca3;}
+.bgc2{background-color:#ff9966;}
+.bgp0{background-image:url(img/-1.gif);}
+.nb-body{background:#fff url(img/zhong-1007-14.gif) repeat scroll left top;}
+.nb-wrap{background:url(img/ding.jpg) no-repeat scroll left top;}
+.nb-bar{background:#ff9966;}
+.nb-top .h{height:354px;}
+.nb-top .t{top:260px;left:190px;font-size:18px;font-family:Verdana,Arial,Helvetica,sans-serif;color:#993300;}
+.nb-top .n{font-size:42px;}
+.nb-nav .h{height:50px;line-height:50px;}
+.nb-nav .l{width:370px;}
+.nb-nav .r{width:60px;}
+.nb-nav .c{margin:0 60px 0 370px;}
+.nb-nav .i{font-weight:normal;font-size:14px;}
+.nb-nav .i:hover{color:#ffffff;}
+.nb-nav .selected{background:url(img/anniu.gif) no-repeat scroll left top;}
+.nb-nav .selected .i, .nb-nav .selected .i:hover{font-weight:bold;color:#990000;background:none;}
+.nb-cnt .wc{margin:0 10px;}
+.nb-fot .wkg{background:url(img/dil-1007-273.gif) no-repeat scroll left top;}
+.nb-fot .h{height:273px;}
+.nb-fot .k{padding-top:40px;}
+.nb-mdl{border:1px none #000000;background:url(img/m5-42-7.gif) repeat scroll left top;margin:10px 5px;}
+.nb-mdl .th{height:46px;line-height:25px;}
+.nb-mdl .bh{height:20px;}
+.nb-mt{background:url(img/m3-113-46.gif) repeat-x scroll left top;}
+.nb-mt .tl{background:url(img/m2-42-46.gif) repeat-x scroll left top;width:42px;}
+.nb-mt .tc{font-size:14px;font-weight:bold;margin:0 66px 0 15px;}
+.nb-mt .tr{background:url(img/m4-66-46.gif) no-repeat scroll left top;width:66px;}
+.nb-mc .cl{display:none;}
+.nb-mc .cc{margin:0 10px;}
+.nb-mb{background:url(img/m10-42-17.gif) repeat-x scroll left top;display:block;}
+.nb-mb .bl{width:10px;}
+.nb-mb .bc{margin:0 10px 0 10px;}
+.nb-mb .br{width:10px;}

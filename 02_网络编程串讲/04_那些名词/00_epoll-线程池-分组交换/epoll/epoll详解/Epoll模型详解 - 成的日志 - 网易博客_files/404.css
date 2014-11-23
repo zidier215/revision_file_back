@@ -1,0 +1,103 @@
+/* reset */
+*[hidefocus]{outline:none;}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,p,blockquote,th,td{padding:0;margin:0;}
+fieldset,img,html,body,iframe{border:0;}
+table{border-collapse:collapse;border-spacing:0;}
+caption,th{font-weight:normal;font-style:normal;}
+em,strong{font-weight:bold;}
+ol,ul{list-style:none;}
+caption,th{text-align:left;}
+h1,h2,h3,h4,h5,h6{font-weight:bold;font-size:100%;}
+input{ border:1px solid #bababa;}
+button{ border:0 none;}
+/* 通用样式定义 */
+a,.noul:hover{text-decoration:none;}
+a:hover,.ul{text-decoration:underline;cursor:pointer;}
+.button{overflow:visible;}
+.clearfix:after,.er-cnt:after{clear:both;content:'.';display:block;height:0;visibility:hidden;}
+.clearfix,.er-cnt{zoom:1;}
+.thide{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.iblock{display:-moz-inline-stack;display:inline-block;zoom:1;*display:inline;}
+.noselect{user-select:none;-moz-user-select:none;-webkit-user-select:none;-khtml-user-select:none;-o-user-select:none;}
+.pre,pre{overflow:hidden;text-align:left;white-space:pre-wrap;white-space:-moz-pre-wrap;white-space:-o-pre-wrap;word-wrap:break-word;word-break:break-all;}
+.hide{display:none;}
+.dot{font-family:simsun;}
+.notxt{overflow:hidden;text-indent:-9999px;}
+.vamall *{vertical-align:middle;}
+.tac{text-align:center;}
+/* 外观样式定义 */
+body,textarea,select{font-family:arial,helvetica,sans-serif;font-size:12px;color:#000;}
+body{color:#303030;background-color:#fff;}
+/* 字体颜色 */
+a,.fc0{ /* 文字颜色 color */ }
+	a:hover,a.fc0:hover{ /* 文字颜色 color */ }
+.fc1{color:#ababab;}
+a.fc1:hover{color:#ababab;}
+.fc2{color:#e1e1e1;}
+a.fc2:hover{color:#e1e1e1;}
+.fc3{color:#888;}
+a.fc3:hover{color:#888;}
+.fc4{color:#777;}
+a.fc4:hover{color:#777;}
+.fc5{color:#87baff;}
+a.fc5:hover{color:#87baff;}
+.fc6{ color:#4c4c4c;}
+.fc7{color:#016c8b;}
+/* 字体大小 */
+.fs0{font-size:12px;}
+.fs1{font-size:14px;}
+.fs2{font-size:36px;}
+.fs3{font-size:100px;}
+.fs4{font-size:26px;}
+/* 字体粗细 */
+.fw0{font-weight:400;}
+.fw1{font-weight:700;}
+/* 边框 */
+.bds0{border-style:solid;}
+.bds1{border-style:dotted;}
+.bds2{border-style:dashed;}
+.bdwa{border-width:1px;}
+.bdwh{border-width:0px 1px;}
+.bdwv{border-width:1px 0px;}
+.bdwt{border-width:1px 0 0 0;}
+.bdwr{border-width:0 1px 0 0;}
+.bdwb{border-width:0 0 1px 0;}
+.bdwl{border-width:0 0 0 1px;}
+.bdc0{border-color:#e9e9e9;}
+/* 图标 */
+.icn0{background:url(http://b.bst.126.net/style/common/error/images/sprite-404.png) no-repeat 9999px 9999px;}
+.icn0-0{background-position:0 0;}
+.icn0-1{background-position:0 -76px;}
+/* 背景颜色 */
+.bgc0{background-color:#fff;}
+.bgc1{background-color:#f1f8ff;}
+/* 组合样式定义 */
+.w-xxxx{}
+/* 结构样式定义 */
+html,body{width:100%;height:100%;}
+html{overflow:auto;overflow-y:scroll;}
+body,.g-ft{text-align:center;}
+.g-doc{width:706px;margin:18px auto;text-align:left;}
+.g-hd{margin-bottom:65px;}
+.g-ft{padding:20px;}
+.er-head{position:relative;width:676px;height:61px;}
+.er-head h1{position:absolute;bottom:-3px;left:0;width:112px;height:61px;}
+.er-head h1 a{display:block;width:98px;height:61px;}
+.er-quick{position:absolute;top:0;right:-30px;}
+.er-cnt{margin-bottom:80px;}
+.er-face{position:relative;float:left;width:224px;margin:-25px 40px 0 0;text-align:right;line-height:normal;}
+.er-detail{float:left;width:315px;}
+.er-detail h2{font-family:"黑体";}
+.er-detail p{padding-top:5px;}
+.er-detail a{margin:0 3px;}
+.er-reason{position:relative;margin:16px 0;padding:14px;}
+.er-reason p{line-height:1.6;letter-spacing:1px;}
+.er-arrow{position:absolute;top:-14px;left:26px;width:14px;height:14px;}
+
+.er-detail-1{ width:100%;}
+.er-detail-1 p{ line-height:2.2;}
+.er-detail-1 p a{ text-decoration:underline;}
+.er-detail-1 .er-reason{ padding:14px 0;}
+.er-detail-1 input{ width:80px; height:28px; line-height:28px; text-indent:5px; vertical-align:middle; text-align:center;}
+.verify img{ margin:0 5px; vertical-align:-8px;}
+.er-detail-1 .button{ display:block; width:104px; height:38px; margin:25px 0; background:#77716f; font-size:14px; color:#fff; font-weight:bold; border-radius:2px;cursor:pointer;}
