@@ -263,7 +263,7 @@
 </node>
 <node CREATED="1378552629820" ID="Freemind_Link_758108844" MODIFIED="1378552673664" TEXT="4&#x3001;&#x5e38;&#x89c1;&#x7684;&#x6570;&#x636e;&#x5e93;&#xff08;oracle&#x3001;Mysql&#x3001;Sqlite&#x3001;Access&#x3001;Sybase&#x3001;SQLite&#xff09;"/>
 </node>
-<node CREATED="1378552679648" ID="Freemind_Link_1627407179" MODIFIED="1378552688179" TEXT="2&#x3001;&#x6570;&#x636e;&#x5e93;">
+<node CREATED="1378552679648" FOLDED="true" ID="Freemind_Link_1627407179" MODIFIED="1378552688179" TEXT="2&#x3001;&#x6570;&#x636e;&#x5e93;">
 <node CREATED="1378552688945" ID="Freemind_Link_30498964" MODIFIED="1378552718976" TEXT="1&#x3001;&#x6570;&#x636e;&#x5e93;&#x7b80;&#x4ecb;&#xff08;sqlite&#x4ecb;&#x7ecd;&#x3001;&#x5b89;&#x88c5;&#x5b57;&#x7b26;&#x754c;&#x9762;&#x3001;&#x56fe;&#x5f62;&#x754c;&#x9762;&#xff0c;&#x7279;&#x6027;&#xff09;"/>
 <node CREATED="1378552719757" FOLDED="true" ID="Freemind_Link_733336375" MODIFIED="1378552725101" TEXT="2&#x3001;sql&#x8bed;&#x53e5;">
 <node CREATED="1378552725492" ID="Freemind_Link_700641228" MODIFIED="1378552732460" TEXT="1&#x3001;&#x6570;&#x636e;&#x5e93;&#x64cd;&#x4f5c;">
@@ -319,7 +319,7 @@
 <node CREATED="1378553458004" ID="Freemind_Link_1527207301" MODIFIED="1378553469333" TEXT="3&#x3001;&#x53d6;&#x6d88;rollback"/>
 </node>
 </node>
-<node CREATED="1378553484130" ID="Freemind_Link_659694631" MODIFIED="1378553491349" TEXT="3&#x3001;sqlC&#x7f16;&#x7a0b;">
+<node CREATED="1378553484130" FOLDED="true" ID="Freemind_Link_659694631" MODIFIED="1378553491349" TEXT="3&#x3001;sqlC&#x7f16;&#x7a0b;">
 <node CREATED="1378553521429" FOLDED="true" ID="Freemind_Link_513050479" MODIFIED="1378553610573" TEXT="0&#x3001;&#x8ba9;&#x5927;&#x5bb6;&#x77e5;&#x9053;sqlite&#x7684;&#x6e90;&#x7801;&#xff0c;&#xa;&#x8bf4;&#x4e0b;&#x5185;&#x5d4c;&#x5f0f;&#x7684;&#x539f;&#x7406;&#xa;&#x5e76;&#x8bb2;&#x4e00;&#x4e0b;&#x6253;&#x5f00;&#x3001;&#x5173;&#x95ed;&#x7684;&#x57fa;&#x672c;&#x64cd;&#x4f5c;&#xa;&#xa;">
 <node CREATED="1378553611948" ID="Freemind_Link_16986013" MODIFIED="1378553617682" TEXT="1&#x3001;sqlite3_open"/>
 <node CREATED="1378553619729" ID="Freemind_Link_565261110" MODIFIED="1378553625683" TEXT="2&#x3001;sqlite3_close"/>
